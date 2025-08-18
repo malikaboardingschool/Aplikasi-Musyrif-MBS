@@ -28,20 +28,25 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+        .tab-active {
+            border-color: #0d9488; /* teal-600 */
+            background-color: #f0fdfa; /* teal-50 */
+            color: #0f766e; /* teal-700 */
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
     <div class="min-h-screen flex flex-col">
         <!-- Header -->
-        <header class="bg-white shadow-md sticky top-0 z-10">
+        <header class="bg-white shadow-md sticky top-0 z-20">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
-                    <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
                         <img src="https://iili.io/FsLlXA7.png" alt="Logo MBS" class="h-10 w-auto" onerror="this.onerror=null;this.src='https://placehold.co/100x100/FFFFFF/000000?text=MBS';">
                         <div>
-                            <h1 class="text-lg font-bold text-gray-800">Aplikasi Musyrif & Musyrifah</h1>
-                            <p class="text-sm text-gray-500">Malika Islamic Boarding School</p>
+                            <h1 class="text-base sm:text-lg font-bold text-gray-800">Aplikasi Musyrif & Musyrifah</h1>
+                            <p class="text-xs sm:text-sm text-gray-500">Malika Islamic Boarding School</p>
                         </div>
                     </div>
                     <div class="text-right">
@@ -55,172 +60,84 @@
         <!-- Main Content -->
         <main class="flex-grow container mx-auto p-4 sm:p-6 lg:p-8">
             
-            <!-- Statistics Cards -->
-            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-xl shadow-lg flex items-center space-x-4 border-l-4 border-red-500">
-                    <div class="bg-red-100 p-3 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Santri Melanggar</p>
-                        <p class="text-2xl font-bold">12</p>
-                    </div>
+            <!-- Statistics Cards (Compact) -->
+            <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-xl shadow flex items-center space-x-3 border-l-4 border-red-500">
+                    <div class="bg-red-100 p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg></div>
+                    <div><p class="text-xs text-gray-500">Melanggar</p><p class="text-xl font-bold">12</p></div>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-lg flex items-center space-x-4 border-l-4 border-green-500">
-                    <div class="bg-green-100 p-3 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Santri Berprestasi</p>
-                        <p class="text-2xl font-bold">8</p>
-                    </div>
+                <div class="bg-white p-4 rounded-xl shadow flex items-center space-x-3 border-l-4 border-green-500">
+                    <div class="bg-green-100 p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></div>
+                    <div><p class="text-xs text-gray-500">Berprestasi</p><p class="text-xl font-bold">8</p></div>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-lg flex items-center space-x-4 border-l-4 border-yellow-500">
-                    <div class="bg-yellow-100 p-3 rounded-full">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Santri Sakit</p>
-                        <p class="text-2xl font-bold">5</p>
-                    </div>
+                <div class="bg-white p-4 rounded-xl shadow flex items-center space-x-3 border-l-4 border-yellow-500">
+                    <div class="bg-yellow-100 p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                    <div><p class="text-xs text-gray-500">Sakit</p><p class="text-xl font-bold">5</p></div>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-lg flex items-center space-x-4 border-l-4 border-blue-500">
-                    <div class="bg-blue-100 p-3 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H3" /></svg>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Izin Pulang</p>
-                        <p class="text-2xl font-bold">2</p>
-                    </div>
+                <div class="bg-white p-4 rounded-xl shadow flex items-center space-x-3 border-l-4 border-blue-500">
+                    <div class="bg-blue-100 p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H3" /></svg></div>
+                    <div><p class="text-xs text-gray-500">Izin Pulang</p><p class="text-xl font-bold">2</p></div>
                 </div>
             </section>
 
             <!-- Main Grid Layout -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
-                <!-- Left Column: Main Forms -->
+                <!-- Left Column: Input Section with Tabs -->
                 <div class="lg:col-span-2 space-y-8">
-                    <!-- Health Input Form -->
                     <div class="bg-white p-6 rounded-xl shadow-lg">
-                        <h2 class="text-xl font-bold mb-4 border-b pb-2">Input Data Kesehatan Santri</h2>
-                        <form id="healthForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="healthDate" class="block text-sm font-medium text-gray-700">Tanggal Sakit</label>
-                                <input type="date" id="healthDate" name="healthDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required>
-                            </div>
-                            <div>
-                                <label for="healthClass" class="block text-sm font-medium text-gray-700">Kelas</label>
-                                <select id="healthClass" name="healthClass" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required>
-                                    <option value="">Pilih Kelas</option>
-                                </select>
-                            </div>
-                             <div>
-                                <label for="healthName" class="block text-sm font-medium text-gray-700">Nama Santri</label>
-                                <select id="healthName" name="healthName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required>
-                                    <option value="">Pilih Nama</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="healthRoom" class="block text-sm font-medium text-gray-700">Kamar</label>
-                                <input type="text" id="healthRoom" name="healthRoom" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Contoh: A-101" required>
-                            </div>
-                            <div>
-                                <label for="healthSickness" class="block text-sm font-medium text-gray-700">Jenis Sakit</label>
-                                <select id="healthSickness" name="healthSickness" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required>
-                                    <option value="">Pilih Jenis Sakit</option>
-                                </select>
-                            </div>
-                             <div>
-                                <label for="healthStatus" class="block text-sm font-medium text-gray-700">Status</label>
-                                <select id="healthStatus" name="healthStatus" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required>
-                                    <option value="Masih Sakit">Masih Sakit</option>
-                                    <option value="Sembuh">Sembuh</option>
-                                    <option value="Izin Pulang">Izin Pulang</option>
-                                </select>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label for="healthTreatment" class="block text-sm font-medium text-gray-700">Penanganan</label>
-                                <textarea id="healthTreatment" name="healthTreatment" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Deskripsikan penanganan yang diberikan" required></textarea>
-                            </div>
-                             <div>
-                                <label for="healthMusyrifCode" class="block text-sm font-medium text-gray-700">Kode Musyrif</label>
-                                <input type="text" id="healthMusyrifCode" name="healthMusyrifCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Masukkan kode Anda" required>
-                            </div>
-                            <div class="md:col-span-2 text-right">
-                                <button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition">
-                                    Simpan Data
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Discipline Links -->
-                    <div class="bg-white p-6 rounded-xl shadow-lg">
-                        <h2 class="text-xl font-bold mb-4">Pencatatan Disiplin</h2>
-                        <div class="space-y-3">
-                            <h3 class="font-semibold text-gray-700">SMP & SMA Putra</h3>
-                            <a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-A-Putra/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 A SMP Putra</a>
-                            <a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-B-Putra/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 B SMP Putra</a>
-                            <a href="https://malikaboardingschool.github.io/Poin-Kelas-X-SMA-Putra/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 10 SMA Putra</a>
-                            <h3 class="font-semibold text-gray-700 pt-3">SMP & SMA Putri</h3>
-                            <a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-A-PutrI/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 A SMP Putri</a>
-                            <a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-B-PutrI/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 B SMP Putri</a>
-                            <a href="https://malikaboardingschool.github.io/Poin-Kelas-X-SMA-Putri/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 10 SMA Putri</a>
+                        <h2 class="text-xl font-bold mb-4">Input Data Santri</h2>
+                        <!-- Tabs -->
+                        <div class="border-b border-gray-200">
+                            <nav class="-mb-px flex space-x-4" aria-label="Tabs">
+                                <button data-tab="health" class="tab-button whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm tab-active">Kesehatan</button>
+                                <button data-tab="discipline" class="tab-button whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Disiplin</button>
+                                <button data-tab="achievement" class="tab-button whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Prestasi</button>
+                            </nav>
                         </div>
-                    </div>
-
-                    <!-- Achievement Input Form -->
-                    <div class="bg-white p-6 rounded-xl shadow-lg">
-                        <h2 class="text-xl font-bold mb-4 border-b pb-2">Input Prestasi Santri</h2>
-                        <form id="achievementForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="achieveDate" class="block text-sm font-medium text-gray-700">Tanggal</label>
-                                <input type="date" id="achieveDate" name="achieveDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required>
+                        
+                        <!-- Tab Content -->
+                        <div class="mt-6">
+                            <!-- Health Tab Panel -->
+                            <div id="health-tab" class="tab-panel">
+                                <form id="healthForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div><label for="healthDate" class="block text-sm font-medium text-gray-700">Tanggal Sakit</label><input type="date" id="healthDate" name="healthDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required></div>
+                                    <div><label for="healthClass" class="block text-sm font-medium text-gray-700">Kelas</label><select id="healthClass" name="healthClass" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Kelas</option></select></div>
+                                    <div><label for="healthName" class="block text-sm font-medium text-gray-700">Nama Santri</label><select id="healthName" name="healthName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Nama</option></select></div>
+                                    <div><label for="healthRoom" class="block text-sm font-medium text-gray-700">Kamar</label><input type="text" id="healthRoom" name="healthRoom" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Contoh: A-101" required></div>
+                                    <div><label for="healthSickness" class="block text-sm font-medium text-gray-700">Jenis Sakit</label><select id="healthSickness" name="healthSickness" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Jenis Sakit</option></select></div>
+                                    <div><label for="healthStatus" class="block text-sm font-medium text-gray-700">Status</label><select id="healthStatus" name="healthStatus" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="Masih Sakit">Masih Sakit</option><option value="Sembuh">Sembuh</option><option value="Izin Pulang">Izin Pulang</option></select></div>
+                                    <div class="md:col-span-2"><label for="healthTreatment" class="block text-sm font-medium text-gray-700">Penanganan</label><textarea id="healthTreatment" name="healthTreatment" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Deskripsikan penanganan yang diberikan" required></textarea></div>
+                                    <div><label for="healthMusyrifCode" class="block text-sm font-medium text-gray-700">Kode Musyrif</label><input type="text" id="healthMusyrifCode" name="healthMusyrifCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Masukkan kode Anda" required></div>
+                                    <div class="md:col-span-2 text-right"><button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition">Simpan Data</button></div>
+                                </form>
                             </div>
-                            <div>
-                                <label for="achieveClass" class="block text-sm font-medium text-gray-700">Kelas</label>
-                                <select id="achieveClass" name="achieveClass" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required>
-                                    <option value="">Pilih Kelas</option>
-                                </select>
+                            <!-- Discipline Tab Panel -->
+                            <div id="discipline-tab" class="tab-panel hidden">
+                                <div class="space-y-3"><h3 class="font-semibold text-gray-700">SMP & SMA Putra</h3><a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-A-Putra/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 A SMP Putra</a><a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-B-Putra/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 B SMP Putra</a><a href="https://malikaboardingschool.github.io/Poin-Kelas-X-SMA-Putra/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 10 SMA Putra</a><h3 class="font-semibold text-gray-700 pt-3">SMP & SMA Putri</h3><a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-A-PutrI/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 A SMP Putri</a><a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-B-PutrI/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 B SMP Putri</a><a href="https://malikaboardingschool.github.io/Poin-Kelas-X-SMA-Putri/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 10 SMA Putri</a></div>
                             </div>
-                            <div>
-                                <label for="achieveName" class="block text-sm font-medium text-gray-700">Nama Santri</label>
-                                <select id="achieveName" name="achieveName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required>
-                                    <option value="">Pilih Nama</option>
-                                </select>
+                            <!-- Achievement Tab Panel -->
+                            <div id="achievement-tab" class="tab-panel hidden">
+                                <form id="achievementForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div><label for="achieveDate" class="block text-sm font-medium text-gray-700">Tanggal</label><input type="date" id="achieveDate" name="achieveDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required></div>
+                                    <div><label for="achieveClass" class="block text-sm font-medium text-gray-700">Kelas</label><select id="achieveClass" name="achieveClass" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Kelas</option></select></div>
+                                    <div><label for="achieveName" class="block text-sm font-medium text-gray-700">Nama Santri</label><select id="achieveName" name="achieveName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Nama</option></select></div>
+                                    <div><label for="achieveType" class="block text-sm font-medium text-gray-700">Jenis Prestasi</label><select id="achieveType" name="achieveType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Jenis Prestasi</option></select></div>
+                                    <div><label for="achievePoints" class="block text-sm font-medium text-gray-700">Poin</label><input type="number" id="achievePoints" name="achievePoints" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 focus:border-teal-500 focus:ring-teal-500" readonly></div>
+                                    <div><label for="achieveMusyrifCode" class="block text-sm font-medium text-gray-700">Kode Musyrif</label><input type="text" id="achieveMusyrifCode" name="achieveMusyrifCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Masukkan kode Anda" required></div>
+                                    <div class="md:col-span-2 text-right"><button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">Tambah Poin</button></div>
+                                </form>
                             </div>
-                            <div>
-                                <label for="achieveType" class="block text-sm font-medium text-gray-700">Jenis Prestasi</label>
-                                <select id="achieveType" name="achieveType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required>
-                                    <option value="">Pilih Jenis Prestasi</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="achievePoints" class="block text-sm font-medium text-gray-700">Poin</label>
-                                <input type="number" id="achievePoints" name="achievePoints" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 focus:border-teal-500 focus:ring-teal-500" readonly>
-                            </div>
-                            <div>
-                                <label for="achieveMusyrifCode" class="block text-sm font-medium text-gray-700">Kode Musyrif</label>
-                                <input type="text" id="achieveMusyrifCode" name="achieveMusyrifCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Masukkan kode Anda" required>
-                            </div>
-                            <div class="md:col-span-2 text-right">
-                                <button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">
-                                    Tambah Poin
-                                </button>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Right Column: Notes -->
                 <div class="space-y-8">
-                    <!-- Quick Notes -->
                     <div class="bg-yellow-100 p-6 rounded-xl shadow-lg border-l-4 border-yellow-400">
                         <h2 class="text-xl font-bold text-yellow-800 mb-2">Quick Notes</h2>
-                        <p class="text-sm text-yellow-700 mb-4">Reminder Hari Ini :</p>
-                        <blockquote class="border-l-4 border-yellow-500 pl-4 italic text-yellow-800">
-                            "Bismillah. Para musyrif dan musyrifah, Semangkaaa !."
-                        </blockquote>
+                        <p class="text-sm text-yellow-700 mb-4">Pesan dari Direktur Sekolah:</p>
+                        <blockquote class="border-l-4 border-yellow-500 pl-4 italic text-yellow-800">"Bismillah. Para musyrif dan musyrifah, teruslah menjadi teladan yang baik. Perhatikan kesehatan dan perkembangan akhlak setiap santri. Jazakumullah khairan katsiran atas dedikasinya."</blockquote>
                     </div>
                 </div>
             </div>
@@ -229,25 +146,7 @@
             <section class="mt-8">
                 <div class="bg-white p-6 rounded-xl shadow-lg">
                     <h2 class="text-xl font-bold mb-4">List Santri Sakit Harian</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-gray-500">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3">Tanggal</th>
-                                    <th scope="col" class="px-6 py-3">Kelas</th>
-                                    <th scope="col" class="px-6 py-3">Nama Santri</th>
-                                    <th scope="col" class="px-6 py-3">Jenis Sakit</th>
-                                    <th scope="col" class="px-6 py-3">Penanganan</th>
-                                    <th scope="col" class="px-6 py-3">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="sickListTableBody">
-                                <tr id="no-data-row">
-                                    <td colspan="6" class="text-center py-10 text-gray-400">Belum ada data santri sakit yang diinput hari ini.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <div class="overflow-x-auto"><table class="w-full text-sm text-left text-gray-500"><thead class="text-xs text-gray-700 uppercase bg-gray-100"><tr><th scope="col" class="px-6 py-3">Tanggal</th><th scope="col" class="px-6 py-3">Kelas</th><th scope="col" class="px-6 py-3">Nama Santri</th><th scope="col" class="px-6 py-3">Jenis Sakit</th><th scope="col" class="px-6 py-3">Penanganan</th><th scope="col" class="px-6 py-3">Status</th></tr></thead><tbody id="sickListTableBody"><tr id="no-data-row"><td colspan="6" class="text-center py-10 text-gray-400">Belum ada data santri sakit yang diinput hari ini.</td></tr></tbody></table></div>
                 </div>
             </section>
         </main>
@@ -255,7 +154,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- DATA ---
+            // --- DATA (Sama seperti sebelumnya) ---
             const studentData = {
                 '7 A Putra': ['Athariz Chalief Saputra', 'Ahmad Khomaini', 'Al Athar Ghaizan Nobel', 'Alzabar Akbar', 'Arya Devano', 'Abyan Dzaky Hafizh Kurniawan', 'Fadil Syafif Nugroho Sukri', 'Fakhri Muhammad Mumtaz', 'I Komang Raditiya Novian Pradana Putra', 'Ibad Najwan', 'Ibni Shidqie Al Mumtazhar', 'Kenzie Dastan Shalahuddin Zan', 'Khaerul A\'Zam Ismail', 'Khairiy Rezki Adhinata', 'Lionel Pratama Nugroho', 'Mahfidz Ardiansyah', 'Mohamad Akromul Azam', 'Mohammad Ezra Rafiandhika', 'Mufadilah Kafi Ananta', 'Muhammad Akhtar Al Hisyam', 'Muhammad Al Fatih', 'Muhammad Fatir Albahri', 'Muhammad Naufal Afkar', 'Muhammad Naufal Rizki', 'Muhammad Syamil At Tsauri', 'Nauval Abdul Rasyid', 'Pranatantra Fachrie', 'Rajata Ibnu Faqih', 'Reygi Antajun Hikaru', 'Rifqi Irfan Hamizan', 'Umar Al Jailaani', 'Yossa Dzulfi Andrean', 'Zahran Sahil'],
                 '7 B Putra': ['Abidzar Nuha Wafi', 'Ach. Raihan Faiz As-Sudaisyi', 'Ahmad Nazmu Durori', 'Akbar Nurfatah Arsadi', 'Akhdan Athaya Putra Zulfikar', 'Al Barra Ananta Putra', 'Alvey Sebastian Ansori', 'Annabighoh Syabanu Gunawan', 'Arrais Mahardika Rusli', 'Athaya Kaysan Hakim', 'Aufa Gilang Pratama', 'Bilal Abdul Aslam', 'Bintang Dasilva Ibrahim', 'Brilliant Alziddan Mustofa', 'Denny Maulana Yusuf', 'Fathir Muhammad Fadhilah', 'Haikal Ahfwan', 'Harry Harsya Shiddiq', 'Ifan Sofyan', 'Kenzie Adelio Tristan', 'Khairul Walif', 'Luthfirrahman Nafis Hananto', 'Muhammad Al-Gaza Putra Dewian', 'Muhammad Arafa Ekiyano Febrian', 'Muhammad Dilfa Fattan', 'Muhammad Fahriansyah', 'Muhammad Fathan Toriq', 'Muhammad Haikal Al Faisya', 'Muhammad Najetullah', 'Muhammad Raditya Fauzan', 'Muhammad Waldan', 'Rayhan Faiz Abdillah Hadiyanto', 'Sultan Fatih Setiawan', 'Zhafran Tata Hidayat'],
@@ -264,19 +163,8 @@
                 '7 B Putri': ['Aesha Bellvania Kirana', 'Aira Fitriani Azzahra', 'Aisyah Fahira Husna', 'Alya Zahra Nabila', 'Ameera Isnain Setiadi', 'Aulia Zahra Ibrahim', 'Azizahtun Nazwa', 'Ghina Bilqis Shabreen', 'Hafizhah Alimah', 'Haninda Aulia Dayana', 'Hilma Arifa Aulia Rosid', 'Jihan Amira Karim', 'Keyla Khanza Ramadhani', 'Nafisa Al Mahira', 'Nailatisya Aquina Salsabilla', 'Nilam Maulina Anggrainin', 'R A Najeela Putri Widiarsa', 'Rhaqueena Aleameccha Alingga', 'Salsabila Zovanka', 'Shakila Aulia Sakhiy', 'Shifa Mumtazah', 'Siti Alifia Zahra', 'Siti Zahwa Naura Auni', 'Siti Ziarra Nur Al-Jaelani', 'Syafa Savira', 'Syakilah Putri Oktavia', 'Syakirah Rizqia Ramadani', 'Tuhfatun Najwa', 'Vinca Fitranavira Putri', 'Zhafira Nur Azzahra'],
                 '10 Putri': ['Alfina Dhiya Ulhaq', 'Amelinda Nur Febrina', 'Amira Azzarine', 'Anjeli Ghenia Asmedi', 'Aulia Zahra Nursakinah', 'Callysta Zhahira', 'Citra Aulia Saputra', 'Egidhea Sakha Gendis', 'Faiha Ulayya', 'Kanaya Azzalea Maulida', 'Kayla Putri Azzahra', 'Kesya Anastasya Putri', 'Keysha Hana Alzena', 'Khansa Avicenna', 'Maia Dina Islamiy Sobariah', 'Nailah Saffanah Rizqin', 'Najwa Althafunisa', 'Nasya Adya Mustafidah', 'Raihana Radwa Fahira', 'Ratu Syahlina Samlawi', 'Siti Aulia Rahma', 'Syifa Az Zahra', 'Tia Anggrianti', 'Ussy Elsinasari', 'Vicky Fadilah Luthfiyana', 'Virly Evelyn Dean Zahra', 'Wildatul Hasanah', 'Yolanda Febriani', 'Yuha Rizqiyatul Muyassaroh', 'Zahiratul Aisyi', 'Zulfa Nurul Fauziah']
             };
-
             const sicknessList = ['Alergi', 'Anemia', 'Asma', 'Batuk', 'Cantengan (Paronikia)', 'Cedera / Luka lecet / memar', 'Cemas berlebihan', 'Demam ringan', 'Diare', 'Flu', 'Gatal Kulit', 'Insomnia / sulit tidur', 'Keseleo', 'Luka bakar ringan', 'Maag', 'Masuk angin', 'Mual', 'Nyeri haid', 'Nyeri otot', 'Panas Dalam', 'Pegal', 'Perut Kembung', 'Pilek', 'Pusing Lemas', 'Radang tenggorokan', 'Sakit gigi', 'Sakit kepala / migrain', 'Sakit mata', 'Sariawan', 'Terkilir', 'Lainnya'];
-
-            const achievementList = [
-                { text: 'Datang tepat waktu 1 minggu penuh tanpa absen', points: 5 },
-                { text: 'Menambah hafalan Qur’an sesuai target mingguan', points: 5 },
-                { text: 'Menjaga kerapihan kamar & area umum (1 bulan)', points: 10 },
-                { text: 'Menghafal 50 mufradat baru per bulan', points: 10 },
-                { text: 'Menunjukkan sopan santun ekstra (1 bulan)', points: 10 },
-                { text: 'Menang lomba di sekolah', points: 15 },
-                { text: 'Menang lomba tingkat kecamatan', points: 20 },
-                { text: 'Menang lomba tingkat kota/provinsi', points: 25 }
-            ];
+            const achievementList = [ { text: 'Datang tepat waktu 1 minggu penuh tanpa absen', points: 5 }, { text: 'Menambah hafalan Qur’an sesuai target mingguan', points: 5 }, { text: 'Menjaga kerapihan kamar & area umum (1 bulan)', points: 10 }, { text: 'Menghafal 50 mufradat baru per bulan', points: 10 }, { text: 'Menunjukkan sopan santun ekstra (1 bulan)', points: 10 }, { text: 'Menang lomba di sekolah', points: 15 }, { text: 'Menang lomba tingkat kecamatan', points: 20 }, { text: 'Menang lomba tingkat kota/provinsi', points: 25 } ];
 
             // --- ELEMENT SELECTORS ---
             const healthClassSelect = document.getElementById('healthClass');
@@ -284,129 +172,75 @@
             const healthSicknessSelect = document.getElementById('healthSickness');
             const healthForm = document.getElementById('healthForm');
             const sickListTableBody = document.getElementById('sickListTableBody');
-            
             const achieveClassSelect = document.getElementById('achieveClass');
             const achieveNameSelect = document.getElementById('achieveName');
             const achieveTypeSelect = document.getElementById('achieveType');
             const achievePointsInput = document.getElementById('achievePoints');
             const achievementForm = document.getElementById('achievementForm');
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanels = document.querySelectorAll('.tab-panel');
 
             // --- FUNCTIONS ---
-
-            // Function to populate a select element with options
-            function populateSelect(selectElement, options) {
-                options.forEach(option => {
-                    const opt = document.createElement('option');
-                    opt.value = option;
-                    opt.textContent = option;
-                    selectElement.appendChild(opt);
-                });
-            }
-            
-            // Function to populate student names based on selected class
-            function populateStudentNames(classSelect, nameSelect) {
-                const selectedClass = classSelect.value;
-                nameSelect.innerHTML = '<option value="">Pilih Nama</option>'; // Clear previous options
-                if (selectedClass && studentData[selectedClass]) {
-                    populateSelect(nameSelect, studentData[selectedClass]);
-                }
-            }
-
-            // Function to update date and time
-            function updateDateTime() {
-                const now = new Date();
-                const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                document.getElementById('current-date').textContent = now.toLocaleDateString('id-ID', optionsDate);
-                document.getElementById('current-time').textContent = now.toLocaleTimeString('id-ID');
-            }
+            function populateSelect(selectElement, options) { options.forEach(option => { const opt = document.createElement('option'); opt.value = option; opt.textContent = option; selectElement.appendChild(opt); }); }
+            function populateStudentNames(classSelect, nameSelect) { const selectedClass = classSelect.value; nameSelect.innerHTML = '<option value="">Pilih Nama</option>'; if (selectedClass && studentData[selectedClass]) { populateSelect(nameSelect, studentData[selectedClass]); } }
+            function updateDateTime() { const now = new Date(); const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }; document.getElementById('current-date').textContent = now.toLocaleDateString('id-ID', optionsDate); document.getElementById('current-time').textContent = now.toLocaleTimeString('id-ID'); }
 
             // --- INITIALIZATION ---
-
-            // Populate class dropdowns
             const classNames = Object.keys(studentData);
             populateSelect(healthClassSelect, classNames);
             populateSelect(achieveClassSelect, classNames);
-
-            // Populate sickness dropdown
             populateSelect(healthSicknessSelect, sicknessList);
-            
-            // Populate achievement dropdown
-            achievementList.forEach(ach => {
-                const opt = document.createElement('option');
-                opt.value = ach.text;
-                opt.textContent = ach.text;
-                opt.dataset.points = ach.points;
-                achieveTypeSelect.appendChild(opt);
-            });
-
-            // Set initial date for date inputs
+            achievementList.forEach(ach => { const opt = document.createElement('option'); opt.value = ach.text; opt.textContent = ach.text; opt.dataset.points = ach.points; achieveTypeSelect.appendChild(opt); });
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('healthDate').value = today;
             document.getElementById('achieveDate').value = today;
-
-            // Update date and time and set interval
             updateDateTime();
             setInterval(updateDateTime, 1000);
 
             // --- EVENT LISTENERS ---
+            // Tab switching logic
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('tab-active', 'border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300'));
+                    tabButtons.forEach(btn => {
+                        if(btn !== button){
+                            btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                        }
+                    });
+                    button.classList.add('tab-active');
 
-            // Health form: update student names on class change
-            healthClassSelect.addEventListener('change', () => populateStudentNames(healthClassSelect, healthNameSelect));
-
-            // Achievement form: update student names on class change
-            achieveClassSelect.addEventListener('change', () => populateStudentNames(achieveClassSelect, achieveNameSelect));
-
-            // Achievement form: update points on achievement type change
-            achieveTypeSelect.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                achievePointsInput.value = selectedOption.dataset.points || '';
+                    const tabId = button.dataset.tab;
+                    tabPanels.forEach(panel => {
+                        if (panel.id === `${tabId}-tab`) {
+                            panel.classList.remove('hidden');
+                        } else {
+                            panel.classList.add('hidden');
+                        }
+                    });
+                });
             });
 
-            // Health form submission
+            healthClassSelect.addEventListener('change', () => populateStudentNames(healthClassSelect, healthNameSelect));
+            achieveClassSelect.addEventListener('change', () => populateStudentNames(achieveClassSelect, achieveNameSelect));
+            achieveTypeSelect.addEventListener('change', function() { const selectedOption = this.options[this.selectedIndex]; achievePointsInput.value = selectedOption.dataset.points || ''; });
             healthForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 const formData = new FormData(this);
                 const data = Object.fromEntries(formData.entries());
-
-                // Remove the "no data" row if it exists
                 const noDataRow = document.getElementById('no-data-row');
-                if (noDataRow) {
-                    noDataRow.remove();
-                }
-
-                // Create and append new table row
-                const newRow = sickListTableBody.insertRow(0); // Insert at the top
+                if (noDataRow) { noDataRow.remove(); }
+                const newRow = sickListTableBody.insertRow(0);
                 newRow.className = 'bg-white border-b hover:bg-gray-50';
-                newRow.innerHTML = `
-                    <td class="px-6 py-4">${new Date(data.healthDate).toLocaleDateString('id-ID')}</td>
-                    <td class="px-6 py-4">${data.healthClass}</td>
-                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">${data.healthName}</td>
-                    <td class="px-6 py-4">${data.healthSickness}</td>
-                    <td class="px-6 py-4">${data.healthTreatment}</td>
-                    <td class="px-6 py-4">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            ${data.healthStatus === 'Sembuh' ? 'bg-green-100 text-green-800' : 
-                              data.healthStatus === 'Izin Pulang' ? 'bg-blue-100 text-blue-800' : 
-                              'bg-yellow-100 text-yellow-800'}">
-                            ${data.healthStatus}
-                        </span>
-                    </td>
-                `;
-                
+                newRow.innerHTML = `<td class="px-6 py-4">${new Date(data.healthDate).toLocaleDateString('id-ID')}</td><td class="px-6 py-4">${data.healthClass}</td><td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">${data.healthName}</td><td class="px-6 py-4">${data.healthSickness}</td><td class="px-6 py-4">${data.healthTreatment}</td><td class="px-6 py-4"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${data.healthStatus === 'Sembuh' ? 'bg-green-100 text-green-800' : data.healthStatus === 'Izin Pulang' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}">${data.healthStatus}</span></td>`;
                 alert('Data kesehatan berhasil disimpan!');
                 this.reset();
-                // Reset dependent dropdowns
                 healthNameSelect.innerHTML = '<option value="">Pilih Nama</option>';
                 document.getElementById('healthDate').value = today;
             });
-
-            // Achievement form submission
             achievementForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                // Here you would typically send the data to a server
                 alert('Poin prestasi berhasil ditambahkan!');
                 this.reset();
-                // Reset dependent dropdowns
                 achieveNameSelect.innerHTML = '<option value="">Pilih Nama</option>';
                 achievePointsInput.value = '';
                 document.getElementById('achieveDate').value = today;
