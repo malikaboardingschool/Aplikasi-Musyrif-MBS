@@ -9,33 +9,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-        .tab-active {
-            border-color: #0d9488; /* teal-600 */
-            background-color: #f0fdfa; /* teal-50 */
-            color: #0f766e; /* teal-700 */
-        }
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        .tab-active { border-color: #0d9488; background-color: #f0fdfa; color: #0f766e; }
+        .btn-loading { position: relative; cursor: not-allowed; opacity: 0.7; }
+        .btn-loading::after { content: ''; position: absolute; right: 1rem; top: 50%; width: 1rem; height: 1rem; margin-top: -0.5rem; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
+
+    <!-- Peringatan Konfigurasi Firebase -->
+    <div id="firebase-warning" class="hidden sticky top-0 z-50 bg-red-600 text-white p-4 text-center shadow-lg">
+        <strong class="font-bold">PENTING:</strong> Konfigurasi Firebase belum diatur! Buka kode, cari baris 320, dan ganti <code>firebaseConfig</code> dengan kode dari project Firebase Anda. Aplikasi tidak akan berfungsi sampai ini diperbaiki.
+    </div>
 
     <div class="min-h-screen flex flex-col">
         <!-- Header -->
@@ -58,25 +48,25 @@
         </header>
 
         <!-- Main Content -->
-        <main class="flex-grow container mx-auto p-4 sm:p-6 lg:p-8">
+        <main class="flex-grow container mx-auto p-4 sm:p-6 lg:px-8">
             
-            <!-- Statistics Cards (Compact) -->
+            <!-- Statistics Cards (Compact & Real-time) -->
             <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div class="bg-white p-4 rounded-xl shadow flex items-center space-x-3 border-l-4 border-red-500">
                     <div class="bg-red-100 p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg></div>
-                    <div><p class="text-xs text-gray-500">Melanggar</p><p class="text-xl font-bold">12</p></div>
+                    <div><p class="text-xs text-gray-500">Melanggar</p><p id="stat-melanggar" class="text-xl font-bold">12</p></div>
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow flex items-center space-x-3 border-l-4 border-green-500">
                     <div class="bg-green-100 p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></div>
-                    <div><p class="text-xs text-gray-500">Berprestasi</p><p class="text-xl font-bold">8</p></div>
+                    <div><p class="text-xs text-gray-500">Berprestasi</p><p id="stat-berprestasi" class="text-xl font-bold">0</p></div>
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow flex items-center space-x-3 border-l-4 border-yellow-500">
                     <div class="bg-yellow-100 p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-                    <div><p class="text-xs text-gray-500">Sakit</p><p class="text-xl font-bold">5</p></div>
+                    <div><p class="text-xs text-gray-500">Sakit</p><p id="stat-sakit" class="text-xl font-bold">0</p></div>
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow flex items-center space-x-3 border-l-4 border-blue-500">
                     <div class="bg-blue-100 p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H3" /></svg></div>
-                    <div><p class="text-xs text-gray-500">Izin Pulang</p><p class="text-xl font-bold">2</p></div>
+                    <div><p class="text-xs text-gray-500">Izin Pulang</p><p id="stat-izin" class="text-xl font-bold">0</p></div>
                 </div>
             </section>
 
@@ -101,15 +91,15 @@
                             <!-- Health Tab Panel -->
                             <div id="health-tab" class="tab-panel">
                                 <form id="healthForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div><label for="healthDate" class="block text-sm font-medium text-gray-700">Tanggal Sakit</label><input type="date" id="healthDate" name="healthDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required></div>
-                                    <div><label for="healthClass" class="block text-sm font-medium text-gray-700">Kelas</label><select id="healthClass" name="healthClass" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Kelas</option></select></div>
-                                    <div><label for="healthName" class="block text-sm font-medium text-gray-700">Nama Santri</label><select id="healthName" name="healthName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Nama</option></select></div>
-                                    <div><label for="healthRoom" class="block text-sm font-medium text-gray-700">Kamar</label><input type="text" id="healthRoom" name="healthRoom" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Contoh: A-101" required></div>
-                                    <div><label for="healthSickness" class="block text-sm font-medium text-gray-700">Jenis Sakit</label><select id="healthSickness" name="healthSickness" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Jenis Sakit</option></select></div>
-                                    <div><label for="healthStatus" class="block text-sm font-medium text-gray-700">Status</label><select id="healthStatus" name="healthStatus" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="Masih Sakit">Masih Sakit</option><option value="Sembuh">Sembuh</option><option value="Izin Pulang">Izin Pulang</option></select></div>
-                                    <div class="md:col-span-2"><label for="healthTreatment" class="block text-sm font-medium text-gray-700">Penanganan</label><textarea id="healthTreatment" name="healthTreatment" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Deskripsikan penanganan yang diberikan" required></textarea></div>
-                                    <div><label for="healthMusyrifCode" class="block text-sm font-medium text-gray-700">Kode Musyrif</label><input type="text" id="healthMusyrifCode" name="healthMusyrifCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Masukkan kode Anda" required></div>
-                                    <div class="md:col-span-2 text-right"><button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition">Simpan Data</button></div>
+                                    <div><label for="healthDate" class="block text-sm font-medium text-gray-700">Tanggal Sakit</label><input type="date" id="healthDate" name="tanggal_sakit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required></div>
+                                    <div><label for="healthClass" class="block text-sm font-medium text-gray-700">Kelas</label><select id="healthClass" name="kelas" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Kelas</option></select></div>
+                                    <div><label for="healthName" class="block text-sm font-medium text-gray-700">Nama Santri</label><select id="healthName" name="nama_santri" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Nama</option></select></div>
+                                    <div><label for="healthRoom" class="block text-sm font-medium text-gray-700">Kamar</label><input type="text" id="healthRoom" name="kamar" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Contoh: A-101" required></div>
+                                    <div><label for="healthSickness" class="block text-sm font-medium text-gray-700">Jenis Sakit</label><select id="healthSickness" name="jenis_sakit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Jenis Sakit</option></select></div>
+                                    <div><label for="healthStatus" class="block text-sm font-medium text-gray-700">Status</label><select id="healthStatus" name="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="Masih Sakit">Masih Sakit</option><option value="Sembuh">Sembuh</option><option value="Izin Pulang">Izin Pulang</option></select></div>
+                                    <div class="md:col-span-2"><label for="healthTreatment" class="block text-sm font-medium text-gray-700">Penanganan</label><textarea id="healthTreatment" name="penanganan" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Deskripsikan penanganan yang diberikan" required></textarea></div>
+                                    <div><label for="healthMusyrifCode" class="block text-sm font-medium text-gray-700">Kode Musyrif</label><input type="text" id="healthMusyrifCode" name="kode_musyrif" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Masukkan kode Anda" required></div>
+                                    <div class="md:col-span-2 text-right"><button type="submit" id="healthSubmitBtn" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition">Simpan Data</button></div>
                                 </form>
                             </div>
                             <!-- Discipline Tab Panel -->
@@ -119,13 +109,13 @@
                             <!-- Achievement Tab Panel -->
                             <div id="achievement-tab" class="tab-panel hidden">
                                 <form id="achievementForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div><label for="achieveDate" class="block text-sm font-medium text-gray-700">Tanggal</label><input type="date" id="achieveDate" name="achieveDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required></div>
-                                    <div><label for="achieveClass" class="block text-sm font-medium text-gray-700">Kelas</label><select id="achieveClass" name="achieveClass" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Kelas</option></select></div>
-                                    <div><label for="achieveName" class="block text-sm font-medium text-gray-700">Nama Santri</label><select id="achieveName" name="achieveName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Nama</option></select></div>
-                                    <div><label for="achieveType" class="block text-sm font-medium text-gray-700">Jenis Prestasi</label><select id="achieveType" name="achieveType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Jenis Prestasi</option></select></div>
-                                    <div><label for="achievePoints" class="block text-sm font-medium text-gray-700">Poin</label><input type="number" id="achievePoints" name="achievePoints" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 focus:border-teal-500 focus:ring-teal-500" readonly></div>
-                                    <div><label for="achieveMusyrifCode" class="block text-sm font-medium text-gray-700">Kode Musyrif</label><input type="text" id="achieveMusyrifCode" name="achieveMusyrifCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Masukkan kode Anda" required></div>
-                                    <div class="md:col-span-2 text-right"><button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">Tambah Poin</button></div>
+                                    <div><label for="achieveDate" class="block text-sm font-medium text-gray-700">Tanggal</label><input type="date" id="achieveDate" name="tanggal" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required></div>
+                                    <div><label for="achieveClass" class="block text-sm font-medium text-gray-700">Kelas</label><select id="achieveClass" name="kelas" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Kelas</option></select></div>
+                                    <div><label for="achieveName" class="block text-sm font-medium text-gray-700">Nama Santri</label><select id="achieveName" name="nama_santri" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Nama</option></select></div>
+                                    <div><label for="achieveType" class="block text-sm font-medium text-gray-700">Jenis Prestasi</label><select id="achieveType" name="jenis_prestasi" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Jenis Prestasi</option></select></div>
+                                    <div><label for="achievePoints" class="block text-sm font-medium text-gray-700">Poin</label><input type="number" id="achievePoints" name="poin" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 focus:border-teal-500 focus:ring-teal-500" readonly></div>
+                                    <div><label for="achieveMusyrifCode" class="block text-sm font-medium text-gray-700">Kode Musyrif</label><input type="text" id="achieveMusyrifCode" name="kode_musyrif" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Masukkan kode Anda" required></div>
+                                    <div class="md:col-span-2 text-right"><button type="submit" id="achieveSubmitBtn" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">Tambah Poin</button></div>
                                 </form>
                             </div>
                         </div>
@@ -137,7 +127,7 @@
                     <div class="bg-yellow-100 p-6 rounded-xl shadow-lg border-l-4 border-yellow-400">
                         <h2 class="text-xl font-bold text-yellow-800 mb-2">Quick Notes</h2>
                         <p class="text-sm text-yellow-700 mb-4">Pesan dari Direktur Sekolah:</p>
-                        <blockquote class="border-l-4 border-yellow-500 pl-4 italic text-yellow-800">"Bismillah. Para musyrif dan musyrifah, teruslah menjadi teladan yang baik. Perhatikan kesehatan dan perkembangan akhlak setiap santri. Jazakumullah khairan katsiran atas dedikasinya."</blockquote>
+                        <blockquote id="quick-note-content" class="border-l-4 border-yellow-500 pl-4 italic text-yellow-800">Memuat catatan...</blockquote>
                     </div>
                 </div>
             </div>
@@ -145,21 +135,58 @@
             <!-- Daily Sick List Table -->
             <section class="mt-8">
                 <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <h2 class="text-xl font-bold mb-4">List Santri Sakit Harian</h2>
-                    <div class="overflow-x-auto"><table class="w-full text-sm text-left text-gray-500"><thead class="text-xs text-gray-700 uppercase bg-gray-100"><tr><th scope="col" class="px-6 py-3">Tanggal</th><th scope="col" class="px-6 py-3">Kelas</th><th scope="col" class="px-6 py-3">Nama Santri</th><th scope="col" class="px-6 py-3">Jenis Sakit</th><th scope="col" class="px-6 py-3">Penanganan</th><th scope="col" class="px-6 py-3">Status</th></tr></thead><tbody id="sickListTableBody"><tr id="no-data-row"><td colspan="6" class="text-center py-10 text-gray-400">Belum ada data santri sakit yang diinput hari ini.</td></tr></tbody></table></div>
+                    <h2 class="text-xl font-bold mb-4">List Santri Sakit Harian (Real-time)</h2>
+                    <div class="overflow-x-auto"><table class="w-full text-sm text-left text-gray-500"><thead class="text-xs text-gray-700 uppercase bg-gray-100"><tr><th scope="col" class="px-6 py-3">Tanggal</th><th scope="col" class="px-6 py-3">Kelas</th><th scope="col" class="px-6 py-3">Nama Santri</th><th scope="col" class="px-6 py-3">Jenis Sakit</th><th scope="col" class="px-6 py-3">Penanganan</th><th scope="col" class="px-6 py-3">Status</th></tr></thead><tbody id="sickListTableBody"></tbody></table></div>
                 </div>
             </section>
         </main>
     </div>
 
-    <script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+        // ===================================================================================
+        // TODO: GANTI DENGAN KONFIGURASI FIREBASE ANDA
+        // Salin-tempel (copy-paste) objek konfigurasi dari Project Settings Firebase Anda di sini
+        const firebaseConfig = {
+  apiKey: "AIzaSyDFbX-6CRLe3joQekOhVwQq0QWhzkENHws",
+  authDomain: "aplikasimusyrifmbs.firebaseapp.com",
+  projectId: "aplikasimusyrifmbs",
+  storageBucket: "aplikasimusyrifmbs.firebasestorage.app",
+  messagingSenderId: "563895271320",
+  appId: "1:563895271320:web:7284a16cf90597bd7c75ed",
+  measurementId: "G-6Z81RESLX8"
+};
+        // ===================================================================================
+        
+        // --- Cek Konfigurasi Firebase ---
+        // Cek apakah konfigurasi masih placeholder. Jika ya, tampilkan peringatan dan hentikan eksekusi.
+        if (firebaseConfig.projectId === "nama-proyek" || firebaseConfig.apiKey === "AIza...") {
+            document.getElementById('firebase-warning').classList.remove('hidden');
+            // Nonaktifkan semua tombol submit untuk mencegah error
+            document.querySelectorAll('button[type="submit"]').forEach(button => {
+                button.disabled = true;
+                button.classList.add('opacity-50', 'cursor-not-allowed');
+            });
+            // Hentikan sisa script agar tidak mencoba koneksi ke Firebase yang salah
+            throw new Error("Firebase config is not set. Please update the firebaseConfig object in the script.");
+        }
+
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         document.addEventListener('DOMContentLoaded', function() {
-            // --- DATA (Sama seperti sebelumnya) ---
+            // --- DATA STATIS (Sama seperti sebelumnya) ---
             const studentData = {
                 '7 A Putra': ['Athariz Chalief Saputra', 'Ahmad Khomaini', 'Al Athar Ghaizan Nobel', 'Alzabar Akbar', 'Arya Devano', 'Abyan Dzaky Hafizh Kurniawan', 'Fadil Syafif Nugroho Sukri', 'Fakhri Muhammad Mumtaz', 'I Komang Raditiya Novian Pradana Putra', 'Ibad Najwan', 'Ibni Shidqie Al Mumtazhar', 'Kenzie Dastan Shalahuddin Zan', 'Khaerul A\'Zam Ismail', 'Khairiy Rezki Adhinata', 'Lionel Pratama Nugroho', 'Mahfidz Ardiansyah', 'Mohamad Akromul Azam', 'Mohammad Ezra Rafiandhika', 'Mufadilah Kafi Ananta', 'Muhammad Akhtar Al Hisyam', 'Muhammad Al Fatih', 'Muhammad Fatir Albahri', 'Muhammad Naufal Afkar', 'Muhammad Naufal Rizki', 'Muhammad Syamil At Tsauri', 'Nauval Abdul Rasyid', 'Pranatantra Fachrie', 'Rajata Ibnu Faqih', 'Reygi Antajun Hikaru', 'Rifqi Irfan Hamizan', 'Umar Al Jailaani', 'Yossa Dzulfi Andrean', 'Zahran Sahil'],
                 '7 B Putra': ['Abidzar Nuha Wafi', 'Ach. Raihan Faiz As-Sudaisyi', 'Ahmad Nazmu Durori', 'Akbar Nurfatah Arsadi', 'Akhdan Athaya Putra Zulfikar', 'Al Barra Ananta Putra', 'Alvey Sebastian Ansori', 'Annabighoh Syabanu Gunawan', 'Arrais Mahardika Rusli', 'Athaya Kaysan Hakim', 'Aufa Gilang Pratama', 'Bilal Abdul Aslam', 'Bintang Dasilva Ibrahim', 'Brilliant Alziddan Mustofa', 'Denny Maulana Yusuf', 'Fathir Muhammad Fadhilah', 'Haikal Ahfwan', 'Harry Harsya Shiddiq', 'Ifan Sofyan', 'Kenzie Adelio Tristan', 'Khairul Walif', 'Luthfirrahman Nafis Hananto', 'Muhammad Al-Gaza Putra Dewian', 'Muhammad Arafa Ekiyano Febrian', 'Muhammad Dilfa Fattan', 'Muhammad Fahriansyah', 'Muhammad Fathan Toriq', 'Muhammad Haikal Al Faisya', 'Muhammad Najetullah', 'Muhammad Raditya Fauzan', 'Muhammad Waldan', 'Rayhan Faiz Abdillah Hadiyanto', 'Sultan Fatih Setiawan', 'Zhafran Tata Hidayat'],
                 '10 Putra': ['Adhwa Arsya Gatfan', 'Afa Zaidan Putra Tamba', 'Ahmad Rafli Dhani Muzakki', 'Akmal Ihsan Huwaidi', 'Albisna Zinata Ababil', 'Asyraf Fairuz Mumtaz', 'Attiq Muzaki Ibrahim', 'Bayanaca Qotthon Elbarca', 'Bazyli Rafif Azka', 'Charli Andestian', 'Danendra Apta Kayana', 'Dhafinzha Muhammad Fakhri', 'Fasabbi Haqiqie Pramada Rozak', 'Irsyad Haitami Fajrin', 'Mikail Abdul Majid', 'Mochammad Alfath Dhafin', 'Muaimar Ghadafi M. Asri', 'Muhamad Fairuz Azmi', 'Muhamad Rafka Alvaro', 'Muhammad Adil Shidqi', 'Muhammad Agla Alfathur Rahman', 'Muhammad Ammar Muzakki', 'Muhammad Azmi', 'Muhammad Fahri Alfarizi', 'Muhammad Fahri Rosadi', 'Muhammad Suryo Nugra Putra Anwar', 'Nawwaf Bilza Pakpahan', 'Raditya Bustanul Tamam', 'Raihan Ramadhan', 'Salim Al Habsyi', 'Sayyid Aqil Sakhiy Wahyudi', 'Yudha Pratama Nurwicaksana Nasution'],
-                '7 A Putri': ['Adara Riyanti', 'Aghniya Musamma Harahap', 'Ahla Amany Maulidya', 'Alivia Zahratukanza', 'Alya Ruby Salimah', 'Ameera Syahida Ajie', 'Asyifa Mahira Lubis', 'Bilqis Ghaisani Ahza', 'Callysta Lareina Nabiha', 'Cordelia Krisna Widyantari', 'Deyanna Abigail Baligha Zephania', 'Fathya Caliana', 'Filzah Ghaisani Fikriyah', 'Indhieswara Maharani', 'Kanaya Athalla Dzakiyyah', 'Kawa\'Iba Puti Firmansyah', 'Keisha Sahila Az Zahra', 'Khansa Ghina Rachmani', 'Mehira Mehrnaz Multazam', 'Nadiya Fajria Salsabila', 'Novilly Azwan', 'Putri Mutia Rahmi', 'Queenisa Yumna Zahirah', 'Rita Madinatul Arofah', 'Saffanah Saafia Zahirah', 'Shelby Sinar Islamadina', 'Shira Rizkia Adara', 'Siti Shofa Aulia Rahman', 'Syifa Anindya', 'Talita Himayatul Kamilah', 'Talita Khansa Saputra', 'Yukqiu Natasha Ardi', 'Zivana Lay'],
+                '7 A Putri': ['Adara Riyanti', 'Aghniya Musamma Harap', 'Ahla Amany Maulidya', 'Alivia Zahratukanza', 'Alya Ruby Salimah', 'Ameera Syahida Ajie', 'Asyifa Mahira Lubis', 'Bilqis Ghaisani Ahza', 'Callysta Lareina Nabiha', 'Cordelia Krisna Widyantari', 'Deyanna Abigail Baligha Zephania', 'Fathya Caliana', 'Filzah Ghaisani Fikriyah', 'Indhieswara Maharani', 'Kanaya Athalla Dzakiyyah', 'Kawa\'Iba Puti Firmansyah', 'Keisha Sahila Az Zahra', 'Khansa Ghina Rachmani', 'Mehira Mehrnaz Multazam', 'Nadiya Fajria Salsabila', 'Novilly Azwan', 'Putri Mutia Rahmi', 'Queenisa Yumna Zahirah', 'Rita Madinatul Arofah', 'Saffanah Saafia Zahirah', 'Shelby Sinar Islamadina', 'Shira Rizkia Adara', 'Siti Shofa Aulia Rahman', 'Syifa Anindya', 'Talita Himayatul Kamilah', 'Talita Khansa Saputra', 'Yukqiu Natasha Ardi', 'Zivana Lay'],
                 '7 B Putri': ['Aesha Bellvania Kirana', 'Aira Fitriani Azzahra', 'Aisyah Fahira Husna', 'Alya Zahra Nabila', 'Ameera Isnain Setiadi', 'Aulia Zahra Ibrahim', 'Azizahtun Nazwa', 'Ghina Bilqis Shabreen', 'Hafizhah Alimah', 'Haninda Aulia Dayana', 'Hilma Arifa Aulia Rosid', 'Jihan Amira Karim', 'Keyla Khanza Ramadhani', 'Nafisa Al Mahira', 'Nailatisya Aquina Salsabilla', 'Nilam Maulina Anggrainin', 'R A Najeela Putri Widiarsa', 'Rhaqueena Aleameccha Alingga', 'Salsabila Zovanka', 'Shakila Aulia Sakhiy', 'Shifa Mumtazah', 'Siti Alifia Zahra', 'Siti Zahwa Naura Auni', 'Siti Ziarra Nur Al-Jaelani', 'Syafa Savira', 'Syakilah Putri Oktavia', 'Syakirah Rizqia Ramadani', 'Tuhfatun Najwa', 'Vinca Fitranavira Putri', 'Zhafira Nur Azzahra'],
                 '10 Putri': ['Alfina Dhiya Ulhaq', 'Amelinda Nur Febrina', 'Amira Azzarine', 'Anjeli Ghenia Asmedi', 'Aulia Zahra Nursakinah', 'Callysta Zhahira', 'Citra Aulia Saputra', 'Egidhea Sakha Gendis', 'Faiha Ulayya', 'Kanaya Azzalea Maulida', 'Kayla Putri Azzahra', 'Kesya Anastasya Putri', 'Keysha Hana Alzena', 'Khansa Avicenna', 'Maia Dina Islamiy Sobariah', 'Nailah Saffanah Rizqin', 'Najwa Althafunisa', 'Nasya Adya Mustafidah', 'Raihana Radwa Fahira', 'Ratu Syahlina Samlawi', 'Siti Aulia Rahma', 'Syifa Az Zahra', 'Tia Anggrianti', 'Ussy Elsinasari', 'Vicky Fadilah Luthfiyana', 'Virly Evelyn Dean Zahra', 'Wildatul Hasanah', 'Yolanda Febriani', 'Yuha Rizqiyatul Muyassaroh', 'Zahiratul Aisyi', 'Zulfa Nurul Fauziah']
             };
@@ -167,86 +194,137 @@
             const achievementList = [ { text: 'Datang tepat waktu 1 minggu penuh tanpa absen', points: 5 }, { text: 'Menambah hafalan Qur’an sesuai target mingguan', points: 5 }, { text: 'Menjaga kerapihan kamar & area umum (1 bulan)', points: 10 }, { text: 'Menghafal 50 mufradat baru per bulan', points: 10 }, { text: 'Menunjukkan sopan santun ekstra (1 bulan)', points: 10 }, { text: 'Menang lomba di sekolah', points: 15 }, { text: 'Menang lomba tingkat kecamatan', points: 20 }, { text: 'Menang lomba tingkat kota/provinsi', points: 25 } ];
 
             // --- ELEMENT SELECTORS ---
-            const healthClassSelect = document.getElementById('healthClass');
-            const healthNameSelect = document.getElementById('healthName');
-            const healthSicknessSelect = document.getElementById('healthSickness');
             const healthForm = document.getElementById('healthForm');
+            const healthSubmitBtn = document.getElementById('healthSubmitBtn');
             const sickListTableBody = document.getElementById('sickListTableBody');
-            const achieveClassSelect = document.getElementById('achieveClass');
-            const achieveNameSelect = document.getElementById('achieveName');
-            const achieveTypeSelect = document.getElementById('achieveType');
-            const achievePointsInput = document.getElementById('achievePoints');
             const achievementForm = document.getElementById('achievementForm');
+            const achieveSubmitBtn = document.getElementById('achieveSubmitBtn');
             const tabButtons = document.querySelectorAll('.tab-button');
             const tabPanels = document.querySelectorAll('.tab-panel');
-
-            // --- FUNCTIONS ---
+            
+            // --- FUNGSI UI ---
             function populateSelect(selectElement, options) { options.forEach(option => { const opt = document.createElement('option'); opt.value = option; opt.textContent = option; selectElement.appendChild(opt); }); }
             function populateStudentNames(classSelect, nameSelect) { const selectedClass = classSelect.value; nameSelect.innerHTML = '<option value="">Pilih Nama</option>'; if (selectedClass && studentData[selectedClass]) { populateSelect(nameSelect, studentData[selectedClass]); } }
             function updateDateTime() { const now = new Date(); const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }; document.getElementById('current-date').textContent = now.toLocaleDateString('id-ID', optionsDate); document.getElementById('current-time').textContent = now.toLocaleTimeString('id-ID'); }
 
-            // --- INITIALIZATION ---
+            // --- INISIALISASI UI ---
             const classNames = Object.keys(studentData);
-            populateSelect(healthClassSelect, classNames);
-            populateSelect(achieveClassSelect, classNames);
-            populateSelect(healthSicknessSelect, sicknessList);
+            populateSelect(document.getElementById('healthClass'), classNames);
+            populateSelect(document.getElementById('achieveClass'), classNames);
+            populateSelect(document.getElementById('healthSickness'), sicknessList);
+            const achieveTypeSelect = document.getElementById('achieveType');
             achievementList.forEach(ach => { const opt = document.createElement('option'); opt.value = ach.text; opt.textContent = ach.text; opt.dataset.points = ach.points; achieveTypeSelect.appendChild(opt); });
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('healthDate').value = today;
             document.getElementById('achieveDate').value = today;
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
+            updateDateTime(); setInterval(updateDateTime, 1000);
 
-            // --- EVENT LISTENERS ---
-            // Tab switching logic
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    tabButtons.forEach(btn => btn.classList.remove('tab-active', 'border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300'));
-                    tabButtons.forEach(btn => {
-                        if(btn !== button){
-                            btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
-                        }
-                    });
-                    button.classList.add('tab-active');
+            // --- EVENT LISTENERS UI ---
+            tabButtons.forEach(button => { button.addEventListener('click', () => { tabButtons.forEach(btn => btn.classList.remove('tab-active')); tabButtons.forEach(btn => { if(btn !== button){ btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300'); }}); button.classList.add('tab-active'); const tabId = button.dataset.tab; tabPanels.forEach(panel => { panel.id === `${tabId}-tab` ? panel.classList.remove('hidden') : panel.classList.add('hidden'); }); }); });
+            document.getElementById('healthClass').addEventListener('change', () => populateStudentNames(document.getElementById('healthClass'), document.getElementById('healthName')));
+            document.getElementById('achieveClass').addEventListener('change', () => populateStudentNames(document.getElementById('achieveClass'), document.getElementById('achieveName')));
+            achieveTypeSelect.addEventListener('change', function() { const selectedOption = this.options[this.selectedIndex]; document.getElementById('achievePoints').value = selectedOption.dataset.points || ''; });
 
-                    const tabId = button.dataset.tab;
-                    tabPanels.forEach(panel => {
-                        if (panel.id === `${tabId}-tab`) {
-                            panel.classList.remove('hidden');
-                        } else {
-                            panel.classList.add('hidden');
-                        }
+            // --- FIREBASE REAL-TIME LISTENERS ---
+
+            // 1. Listener untuk data kesehatan (Tabel & Statistik)
+            const healthQuery = query(collection(db, "data_kesehatan"), orderBy("tanggal_sakit", "desc"));
+            onSnapshot(healthQuery, (querySnapshot) => {
+                sickListTableBody.innerHTML = ''; // Kosongkan tabel
+                let sickCount = 0;
+                let permissionCount = 0;
+
+                if (querySnapshot.empty) {
+                    sickListTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-gray-400">Belum ada data santri sakit.</td></tr>`;
+                } else {
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        
+                        // Update tabel
+                        const newRow = sickListTableBody.insertRow();
+                        newRow.className = 'bg-white border-b hover:bg-gray-50';
+                        newRow.innerHTML = `<td class="px-6 py-4">${new Date(data.tanggal_sakit).toLocaleDateString('id-ID')}</td><td class="px-6 py-4">${data.kelas}</td><td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">${data.nama_santri}</td><td class="px-6 py-4">${data.jenis_sakit}</td><td class="px-6 py-4">${data.penanganan}</td><td class="px-6 py-4"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${data.status === 'Sembuh' ? 'bg-green-100 text-green-800' : data.status === 'Izin Pulang' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}">${data.status}</span></td>`;
+
+                        // Hitung statistik
+                        if (data.status === 'Masih Sakit') sickCount++;
+                        if (data.status === 'Izin Pulang') permissionCount++;
                     });
-                });
+                }
+                // Update kartu statistik
+                document.getElementById('stat-sakit').textContent = sickCount;
+                document.getElementById('stat-izin').textContent = permissionCount;
             });
 
-            healthClassSelect.addEventListener('change', () => populateStudentNames(healthClassSelect, healthNameSelect));
-            achieveClassSelect.addEventListener('change', () => populateStudentNames(achieveClassSelect, achieveNameSelect));
-            achieveTypeSelect.addEventListener('change', function() { const selectedOption = this.options[this.selectedIndex]; achievePointsInput.value = selectedOption.dataset.points || ''; });
-            healthForm.addEventListener('submit', function(e) {
+            // 2. Listener untuk data prestasi (Statistik)
+            onSnapshot(collection(db, "data_prestasi"), (querySnapshot) => {
+                document.getElementById('stat-berprestasi').textContent = querySnapshot.size;
+            });
+
+            // 3. Listener untuk Quick Notes
+            onSnapshot(doc(db, "catatan", "quick_note"), (doc) => {
+                if (doc.exists()) {
+                    document.getElementById('quick-note-content').textContent = doc.data().pesan;
+                } else {
+                    document.getElementById('quick-note-content').textContent = "Catatan belum diatur di database.";
+                }
+            });
+
+            // --- FIREBASE FORM SUBMISSION ---
+            
+            // Kirim data kesehatan ke Firebase
+            healthForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const formData = new FormData(this);
+                const formData = new FormData(healthForm);
                 const data = Object.fromEntries(formData.entries());
-                const noDataRow = document.getElementById('no-data-row');
-                if (noDataRow) { noDataRow.remove(); }
-                const newRow = sickListTableBody.insertRow(0);
-                newRow.className = 'bg-white border-b hover:bg-gray-50';
-                newRow.innerHTML = `<td class="px-6 py-4">${new Date(data.healthDate).toLocaleDateString('id-ID')}</td><td class="px-6 py-4">${data.healthClass}</td><td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">${data.healthName}</td><td class="px-6 py-4">${data.healthSickness}</td><td class="px-6 py-4">${data.healthTreatment}</td><td class="px-6 py-4"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${data.healthStatus === 'Sembuh' ? 'bg-green-100 text-green-800' : data.healthStatus === 'Izin Pulang' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}">${data.healthStatus}</span></td>`;
-                alert('Data kesehatan berhasil disimpan!');
-                this.reset();
-                healthNameSelect.innerHTML = '<option value="">Pilih Nama</option>';
-                document.getElementById('healthDate').value = today;
+
+                healthSubmitBtn.disabled = true;
+                healthSubmitBtn.textContent = 'Menyimpan...';
+                healthSubmitBtn.classList.add('btn-loading');
+
+                try {
+                    await addDoc(collection(db, "data_kesehatan"), data);
+                    alert('Data kesehatan berhasil disimpan ke database!');
+                    healthForm.reset();
+                    document.getElementById('healthName').innerHTML = '<option value="">Pilih Nama</option>';
+                    document.getElementById('healthDate').value = today;
+                } catch (error) {
+                    console.error("Error adding document: ", error);
+                    alert('Gagal menyimpan data. Silakan coba lagi.');
+                } finally {
+                    healthSubmitBtn.disabled = false;
+                    healthSubmitBtn.textContent = 'Simpan Data';
+                    healthSubmitBtn.classList.remove('btn-loading');
+                }
             });
-            achievementForm.addEventListener('submit', function(e) {
+
+            // Kirim data prestasi ke Firebase
+            achievementForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                alert('Poin prestasi berhasil ditambahkan!');
-                this.reset();
-                achieveNameSelect.innerHTML = '<option value="">Pilih Nama</option>';
-                achievePointsInput.value = '';
-                document.getElementById('achieveDate').value = today;
+                const formData = new FormData(achievementForm);
+                const data = Object.fromEntries(formData.entries());
+                data.poin = Number(data.poin); // Pastikan poin adalah angka
+
+                achieveSubmitBtn.disabled = true;
+                achieveSubmitBtn.textContent = 'Menyimpan...';
+                achieveSubmitBtn.classList.add('btn-loading');
+
+                try {
+                    await addDoc(collection(db, "data_prestasi"), data);
+                    alert('Poin prestasi berhasil ditambahkan ke database!');
+                    achievementForm.reset();
+                    document.getElementById('achieveName').innerHTML = '<option value="">Pilih Nama</option>';
+                    document.getElementById('achievePoints').value = '';
+                    document.getElementById('achieveDate').value = today;
+                } catch (error) {
+                    console.error("Error adding document: ", error);
+                    alert('Gagal menyimpan data. Silakan coba lagi.');
+                } finally {
+                    achieveSubmitBtn.disabled = false;
+                    achieveSubmitBtn.textContent = 'Tambah Poin';
+                    achieveSubmitBtn.classList.remove('btn-loading');
+                }
             });
         });
     </script>
-
 </body>
 </html>
