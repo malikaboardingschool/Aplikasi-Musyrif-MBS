@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Musyrif - Malika Islamic Boarding School</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,315 +17,579 @@
         ::-webkit-scrollbar-thumb:hover { background: #555; }
         .tab-active { border-color: #0d9488; background-color: #f0fdfa; color: #0f766e; }
         .btn-loading { position: relative; cursor: not-allowed; opacity: 0.7; }
-        .btn-loading::after { content: ''; position: absolute; right: 1rem; top: 50%; width: 1rem; height: 1rem; margin-top: -0.5rem; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; }
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            width: 1rem;
+            height: 1rem;
+            margin-top: -0.5rem;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .chart-container {
+            position: relative;
+            height: 150px; /* Disesuaikan agar lebih kompak */
+            width: 100%;
+        }
+        #permission-circle-progress {
+            transition: stroke-dasharray 0.5s ease-in-out;
+        }
+        .filter-btn {
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .filter-btn.active {
+            background-color: #ffffff;
+            color: #1e40af;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
-    <!-- Peringatan Konfigurasi Firebase -->
-    <div id="firebase-warning" class="hidden sticky top-0 z-50 bg-red-600 text-white p-4 text-center shadow-lg">
-        <strong class="font-bold">PENTING:</strong> Konfigurasi Firebase belum diatur! Buka kode, cari baris 320, dan ganti <code>firebaseConfig</code> dengan kode dari project Firebase Anda. Aplikasi tidak akan berfungsi sampai ini diperbaiki.
-    </div>
+    <!-- Header Baru -->
+    <header class="bg-white shadow-sm p-4 text-center sticky top-0 z-20">
+        <img src="https://iili.io/FsLlXA7.png" alt="Logo Malika Islamic Boarding School" class="mx-auto h-14 w-auto mb-2">
+        <h1 class="text-xl font-bold text-gray-800">Aplikasi Musyrif & Musyrifah</h1>
+        <p class="text-sm text-gray-500">Malika Boarding School</p>
+        <p id="hijri-date" class="text-sm font-medium text-teal-600 mt-2"></p>
+    </header>
 
-    <div class="min-h-screen flex flex-col">
-        <!-- Header -->
-        <header class="bg-white shadow-md sticky top-0 z-20">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
-                    <div class="flex items-center space-x-3">
-                        <img src="https://iili.io/FsLlXA7.png" alt="Logo MBS" class="h-10 w-auto" onerror="this.onerror=null;this.src='https://placehold.co/100x100/FFFFFF/000000?text=MBS';">
-                        <div>
-                            <h1 class="text-base sm:text-lg font-bold text-gray-800">Aplikasi Musyrif & Musyrifah</h1>
-                            <p class="text-xs sm:text-sm text-gray-500">Malika Islamic Boarding School</p>
-                        </div>
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto p-4 sm:p-6 lg:px-8">
+        
+        <!-- Filter Global untuk Grafik dan Tabel -->
+        <section class="mb-6 flex justify-center">
+             <div id="chart-filter" class="flex items-center space-x-1 bg-gray-100 p-1 rounded-lg">
+                <button data-period="day" class="filter-btn active">Hari Ini</button>
+                <button data-period="week" class="filter-btn">Minggu Ini</button>
+                <button data-period="month" class="filter-btn">Bulan Ini</button>
+            </div>
+        </section>
+        
+        <!-- Statistics Cards (Desain Baru) -->
+        <section class="mb-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Card Kesehatan Baru -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg transition-shadow duration-300 hover:shadow-xl">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-800">Kesehatan Santri</h2>
+                        <p id="health-card-period" class="text-sm text-gray-500">Hari Ini</p>
                     </div>
-                    <div class="text-right">
-                        <p id="current-date" class="text-sm font-medium text-gray-600"></p>
-                        <p id="current-time" class="text-xs text-gray-500"></p>
+                    <div class="bg-red-100 text-red-600 p-2 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                    </div>
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-4 items-center">
+                    <div class="chart-container">
+                        <div id="healthChart" style="width: 100%; height: 100%;"></div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="text-center">
+                            <p class="text-sm text-gray-500">Sakit</p>
+                            <p id="health-sick-count" class="text-3xl font-bold text-red-600">0</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-sm text-gray-500">Sehat</p>
+                            <p id="health-healthy-count" class="text-3xl font-bold text-blue-800">0</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </header>
 
-        <!-- Main Content -->
-        <main class="flex-grow container mx-auto p-4 sm:p-6 lg:px-8">
-            
-            <!-- Statistics Cards (Compact & Real-time) -->
-            <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white p-4 rounded-xl shadow flex items-center space-x-3 border-l-4 border-red-500">
-                    <div class="bg-red-100 p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg></div>
-                    <div><p class="text-xs text-gray-500">Melanggar</p><p id="stat-melanggar" class="text-xl font-bold">0</p></div>
+            <!-- Card Perizinan Baru -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg transition-shadow duration-300 hover:shadow-xl">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-800">Perizinan Santri</h2>
+                        <p id="permission-card-period" class="text-sm text-gray-500">Hari Ini</p>
+                    </div>
+                    <div class="bg-blue-100 text-blue-600 p-2 rounded-lg">
+                        <!-- Ikon Rumah Baru -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                    </div>
                 </div>
-                <div class="bg-white p-4 rounded-xl shadow flex items-center space-x-3 border-l-4 border-green-500">
-                    <div class="bg-green-100 p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></div>
-                    <div><p class="text-xs text-gray-500">Berprestasi</p><p id="stat-berprestasi" class="text-xl font-bold">0</p></div>
+                 <div class="mt-4 grid grid-cols-2 gap-4 items-center">
+                    <div class="chart-container flex items-center justify-center">
+                         <div class="relative w-36 h-36">
+                            <svg class="w-full h-full" viewBox="0 0 36 36">
+                                <path class="text-gray-200 stroke-current" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-width="3" />
+                                <path id="permission-circle-progress" class="text-blue-600 stroke-current" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-linecap="round" stroke-width="3" transform="rotate(-90 18 18)" />
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span id="permission-count" class="text-4xl font-bold text-gray-800">0</span>
+                                <span class="text-sm text-gray-500">Santri</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4 text-center">
+                        <div>
+                            <p class="text-sm text-gray-500">Total Izin</p>
+                            <p id="permission-total-count" class="text-3xl font-bold text-blue-600">0</p>
+                        </div>
+                         <div>
+                            <p class="text-sm text-gray-500">% dari Total</p>
+                            <p id="permission-percentage" class="text-3xl font-bold text-gray-800">0%</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-white p-4 rounded-xl shadow flex items-center space-x-3 border-l-4 border-yellow-500">
-                    <div class="bg-yellow-100 p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-                    <div><p class="text-xs text-gray-500">Sakit</p><p id="stat-sakit" class="text-xl font-bold">0</p></div>
-                </div>
-                <div class="bg-white p-4 rounded-xl shadow flex items-center space-x-3 border-l-4 border-blue-500">
-                    <div class="bg-blue-100 p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H3" /></svg></div>
-                    <div><p class="text-xs text-gray-500">Izin Pulang</p><p id="stat-izin" class="text-xl font-bold">0</p></div>
-                </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Main Grid Layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
-                <!-- Left Column: Input Section with Tabs -->
-                <div class="lg:col-span-2 space-y-8">
-                    <div class="bg-white p-6 rounded-xl shadow-lg">
-                        <h2 class="text-xl font-bold mb-4">Input Data Santri</h2>
-                        <!-- Tabs -->
-                        <div class="border-b border-gray-200">
-                            <nav class="-mb-px flex space-x-4" aria-label="Tabs">
-                                <button data-tab="health" class="tab-button whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm tab-active">Kesehatan</button>
-                                <button data-tab="discipline" class="tab-button whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Disiplin</button>
-                                <button data-tab="achievement" class="tab-button whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Prestasi</button>
-                            </nav>
+
+        <!-- Main Grid Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column: Input Section with Tabs -->
+            <div class="lg:col-span-2 space-y-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-xl font-bold mb-4">Input Data Santri</h2>
+                    <!-- Tabs -->
+                    <div class="border-b border-gray-200">
+                        <nav class="-mb-px flex space-x-4 overflow-x-auto" aria-label="Tabs">
+                            <button data-tab="health" class="tab-button whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm tab-active">Kesehatan</button>
+                            <button data-tab="permission" class="tab-button whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Perizinan</button>
+                            <button data-tab="discipline" class="tab-button whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Disiplin</button>
+                            <button data-tab="achievement" class="tab-button whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">Prestasi</button>
+                        </nav>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="mt-6">
+                        <!-- Health Tab Panel -->
+                        <div id="health-tab" class="tab-panel">
+                            <form id="healthForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Form Kesehatan Fields -->
+                                <div>
+                                    <label for="healthDate" class="block text-sm font-medium text-gray-700">Tanggal Sakit</label>
+                                    <input type="date" id="healthDate" name="tanggal_sakit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required>
+                                </div>
+                                <div>
+                                    <label for="healthClass" class="block text-sm font-medium text-gray-700">Kelas</label>
+                                    <select id="healthClass" name="kelas" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Kelas</option></select>
+                                </div>
+                                <div>
+                                    <label for="healthName" class="block text-sm font-medium text-gray-700">Nama Santri</label>
+                                    <select id="healthName" name="nama_santri" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Nama</option></select>
+                                </div>
+                                <div>
+                                    <label for="healthRoom" class="block text-sm font-medium text-gray-700">Kamar</label>
+                                    <input type="text" id="healthRoom" name="kamar" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Contoh: A-101" required>
+                                </div>
+                                <div>
+                                    <label for="healthSickness" class="block text-sm font-medium text-gray-700">Jenis Sakit</label>
+                                    <select id="healthSickness" name="jenis_sakit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Jenis Sakit</option></select>
+                                </div>
+                                <div>
+                                    <label for="healthStatus" class="block text-sm font-medium text-gray-700">Status</label>
+                                    <select id="healthStatus" name="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required>
+                                        <option value="Sakit Hari Pertama">Sakit Hari Pertama</option>
+                                        <option value="Masih Sakit">Masih Sakit</option>
+                                        <option value="Izin Pulang">Izin Pulang</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="healthTreatment" class="block text-sm font-medium text-gray-700">Penanganan</label>
+                                    <textarea id="healthTreatment" name="penanganan" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Deskripsikan penanganan yang diberikan" required></textarea>
+                                </div>
+                                <div>
+                                    <label for="healthMusyrifCode" class="block text-sm font-medium text-gray-700">Kode Musyrif</label>
+                                    <input type="text" id="healthMusyrifCode" name="kode_musyrif" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Masukkan kode Anda" required>
+                                </div>
+                                <div class="md:col-span-2 text-right">
+                                    <button type="submit" id="healthSubmitBtn" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition">Simpan Data</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Permission Tab Panel -->
+                        <div id="permission-tab" class="tab-panel hidden">
+                            <form id="permissionForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="permissionDate" class="block text-sm font-medium text-gray-700">Tanggal Izin</label>
+                                    <input type="date" id="permissionDate" name="tanggal_izin" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                                </div>
+                                <div>
+                                    <label for="permissionClass" class="block text-sm font-medium text-gray-700">Kelas</label>
+                                    <select id="permissionClass" name="kelas" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required><option value="">Pilih Kelas</option></select>
+                                </div>
+                                <div>
+                                    <label for="permissionName" class="block text-sm font-medium text-gray-700">Nama Santri</label>
+                                    <select id="permissionName" name="nama_santri" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required><option value="">Pilih Nama</option></select>
+                                </div>
+                                <div>
+                                    <label for="permissionRoom" class="block text-sm font-medium text-gray-700">Kamar</label>
+                                    <input type="text" id="permissionRoom" name="kamar" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Contoh: A-101" required>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label for="permissionReason" class="block text-sm font-medium text-gray-700">Alasan Perizinan</label>
+                                    <textarea id="permissionReason" name="alasan_perizinan" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Deskripsikan alasan izin" required></textarea>
+                                </div>
+                                <div>
+                                    <label for="permissionGiver" class="block text-sm font-medium text-gray-700">Pemberi Izin</label>
+                                    <input type="text" id="permissionGiver" name="pemberi_izin" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Contoh: Ustadz/Ustadzah Fulan" required>
+                                </div>
+                                <div>
+                                    <label for="permissionMusyrifCode" class="block text-sm font-medium text-gray-700">Kode Musyrif</label>
+                                    <input type="text" id="permissionMusyrifCode" name="kode_musyrif" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Masukkan kode Anda" required>
+                                </div>
+                                <div class="md:col-span-2 text-right">
+                                    <button type="submit" id="permissionSubmitBtn" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">Simpan Izin</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Discipline Tab Panel -->
+                        <div id="discipline-tab" class="tab-panel hidden">
+                            <div class="space-y-3">
+                                <h3 class="font-semibold text-gray-700">SMP & SMA Putra</h3>
+                                <a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-A-Putra/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 A SMP Putra</a>
+                                <a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-B-Putra/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 B SMP Putra</a>
+                                <a href="https://malikaboardingschool.github.io/Poin-Kelas-X-SMA-Putra/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 10 SMA Putra</a>
+                                <h3 class="font-semibold text-gray-700 pt-3">SMP & SMA Putri</h3>
+                                <a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-A-Putri/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 A SMP Putri</a>
+                                <a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-B-Putri/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 B SMP Putri</a>
+                                <a href="https://malikaboardingschool.github.io/Poin-Kelas-X-SMA-Putri/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 10 SMA Putri</a>
+                            </div>
                         </div>
                         
-                        <!-- Tab Content -->
-                        <div class="mt-6">
-                            <!-- Health Tab Panel -->
-                            <div id="health-tab" class="tab-panel">
-                                <form id="healthForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div><label for="healthDate" class="block text-sm font-medium text-gray-700">Tanggal Sakit</label><input type="date" id="healthDate" name="tanggal_sakit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required></div>
-                                    <div><label for="healthClass" class="block text-sm font-medium text-gray-700">Kelas</label><select id="healthClass" name="kelas" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Kelas</option></select></div>
-                                    <div><label for="healthName" class="block text-sm font-medium text-gray-700">Nama Santri</label><select id="healthName" name="nama_santri" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Nama</option></select></div>
-                                    <div><label for="healthRoom" class="block text-sm font-medium text-gray-700">Kamar</label><input type="text" id="healthRoom" name="kamar" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Contoh: A-101" required></div>
-                                    <div><label for="healthSickness" class="block text-sm font-medium text-gray-700">Jenis Sakit</label><select id="healthSickness" name="jenis_sakit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Jenis Sakit</option></select></div>
-                                    <div><label for="healthStatus" class="block text-sm font-medium text-gray-700">Status</label><select id="healthStatus" name="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="Sakit Hari Pertama">Sakit Hari Pertama</option><option value="Masih Sakit">Masih Sakit</option><option value="Izin Pulang">Izin Pulang</option></select></div>
-                                    <div class="md:col-span-2"><label for="healthTreatment" class="block text-sm font-medium text-gray-700">Penanganan</label><textarea id="healthTreatment" name="penanganan" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Deskripsikan penanganan yang diberikan" required></textarea></div>
-                                    <div><label for="healthMusyrifCode" class="block text-sm font-medium text-gray-700">Kode Musyrif</label><input type="text" id="healthMusyrifCode" name="kode_musyrif" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Masukkan kode Anda" required></div>
-                                    <div class="md:col-span-2 text-right"><button type="submit" id="healthSubmitBtn" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition">Simpan Data</button></div>
-                                </form>
-                            </div>
-                            <!-- Discipline Tab Panel -->
-                            <div id="discipline-tab" class="tab-panel hidden">
-                                <div class="space-y-3"><h3 class="font-semibold text-gray-700">SMP & SMA Putra</h3><a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-A-Putra/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 A SMP Putra</a><a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-B-Putra/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 B SMP Putra</a><a href="https://malikaboardingschool.github.io/Poin-Kelas-X-SMA-Putra/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 10 SMA Putra</a><h3 class="font-semibold text-gray-700 pt-3">SMP & SMA Putri</h3><a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-A-PutrI/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 A SMP Putri</a><a href="https://malikaboardingschool.github.io/Poin-Kelas-VII-B-PutrI/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 7 B SMP Putri</a><a href="https://malikaboardingschool.github.io/Poin-Kelas-X-SMA-Putri/" target="_blank" class="block w-full text-left bg-gray-100 hover:bg-teal-100 p-3 rounded-lg transition">Kelas 10 SMA Putri</a></div>
-                            </div>
-                            <!-- Achievement Tab Panel -->
-                            <div id="achievement-tab" class="tab-panel hidden">
-                                <form id="achievementForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div><label for="achieveDate" class="block text-sm font-medium text-gray-700">Tanggal</label><input type="date" id="achieveDate" name="tanggal" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required></div>
-                                    <div><label for="achieveClass" class="block text-sm font-medium text-gray-700">Kelas</label><select id="achieveClass" name="kelas" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Kelas</option></select></div>
-                                    <div><label for="achieveName" class="block text-sm font-medium text-gray-700">Nama Santri</label><select id="achieveName" name="nama_santri" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Nama</option></select></div>
-                                    <div><label for="achieveType" class="block text-sm font-medium text-gray-700">Jenis Prestasi</label><select id="achieveType" name="jenis_prestasi" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Jenis Prestasi</option></select></div>
-                                    <div><label for="achievePoints" class="block text-sm font-medium text-gray-700">Poin</label><input type="number" id="achievePoints" name="poin" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 focus:border-teal-500 focus:ring-teal-500" readonly></div>
-                                    <div><label for="achieveMusyrifCode" class="block text-sm font-medium text-gray-700">Kode Musyrif</label><input type="text" id="achieveMusyrifCode" name="kode_musyrif" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Masukkan kode Anda" required></div>
-                                    <div class="md:col-span-2 text-right"><button type="submit" id="achieveSubmitBtn" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">Tambah Poin</button></div>
-                                </form>
-                            </div>
+                        <!-- Achievement Tab Panel -->
+                        <div id="achievement-tab" class="tab-panel hidden">
+                            <form id="achievementForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Form Prestasi Fields -->
+                                <div>
+                                    <label for="achieveDate" class="block text-sm font-medium text-gray-700">Tanggal</label>
+                                    <input type="date" id="achieveDate" name="tanggal" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required>
+                                </div>
+                                <div>
+                                    <label for="achieveClass" class="block text-sm font-medium text-gray-700">Kelas</label>
+                                    <select id="achieveClass" name="kelas" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required> <option value="">Pilih Kelas</option></select>
+                                </div>
+                                <div>
+                                    <label for="achieveName" class="block text-sm font-medium text-gray-700">Nama Santri</label>
+                                    <select id="achieveName" name="nama_santri" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Nama</option></select>
+                                </div>
+                                <div>
+                                    <label for="achieveType" class="block text-sm font-medium text-gray-700">Jenis Prestasi</label>
+                                    <select id="achieveType" name="jenis_prestasi" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" required><option value="">Pilih Jenis Prestasi</option></select>
+                                </div>
+                                <div>
+                                    <label for="achievePoints" class="block text-sm font-medium text-gray-700">Poin</label>
+                                    <input type="number" id="achievePoints" name="poin" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm bg-gray-100 focus:border-teal-500 focus:ring-teal-500" readonly>
+                                </div>
+                                <div>
+                                    <label for="achieveMusyrifCode" class="block text-sm font-medium text-gray-700">Kode Musyrif</label>
+                                    <input type="text" id="achieveMusyrifCode" name="kode_musyrif" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500" placeholder="Masukkan kode Anda" required>
+                                </div>
+                                <div class="md:col-span-2 text-right">
+                                    <button type="submit" id="achieveSubmitBtn" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition">Tambah Poin</button>
+                                </div>
+                            </form>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Right Column: Notes -->
-                <div class="space-y-8">
-                    <div class="bg-yellow-100 p-6 rounded-xl shadow-lg border-l-4 border-yellow-400">
-                        <h2 class="text-xl font-bold text-yellow-800 mb-2">Quick Notes</h2>
-                        <p class="text-sm text-yellow-700 mb-4">Reminder Hari Ini:</p>
-                        <blockquote id="quick-note-content" class="border-l-4 border-yellow-500 pl-4 italic text-yellow-800">Memuat catatan...</blockquote>
                     </div>
                 </div>
             </div>
 
-            <!-- Daily Sick List Table -->
-            <section class="mt-8">
-                <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <h2 class="text-xl font-bold mb-4">List Santri Sakit Harian (Real-time)</h2>
-                    <div class="overflow-x-auto"><table class="w-full text-sm text-left text-gray-500"><thead class="text-xs text-gray-700 uppercase bg-gray-100"><tr><th scope="col" class="px-6 py-3">Tanggal</th><th scope="col" class="px-6 py-3">Kelas</th><th scope="col" class="px-6 py-3">Nama Santri</th><th scope="col" class="px-6 py-3">Jenis Sakit</th><th scope="col" class="px-6 py-3">Penanganan</th><th scope="col" class="px-6 py-3">Status</th></tr></thead><tbody id="sickListTableBody"></tbody></table></div>
+            <!-- Right Column: Notes -->
+            <div class="space-y-8">
+                <div class="bg-yellow-100 p-6 rounded-xl shadow-lg border-l-4 border-yellow-400">
+                    <h2 class="text-xl font-bold text-yellow-800 mb-4">Quick Notes</h2>
+                    <blockquote id="quick-note-display" class="border-l-4 border-yellow-500 pl-4 italic text-yellow-800 mb-4 min-h-[60px]">Memuat catatan...</blockquote>
+                    <p class="text-xs text-yellow-700 text-right">Direktur MBS.</p>
                 </div>
-            </section>
-        </main>
-    </div>
+            </div>
+        </div>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        <!-- Daily Sick List Table -->
+        <section class="mt-8">
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="sick-list-title" class="text-xl font-bold">Informasi Santri Sakit</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Tanggal Sakit</th>
+                                <th scope="col" class="px-6 py-3">Kelas</th>
+                                <th scope="col" class="px-6 py-3">Nama Santri</th>
+                                <th scope="col" class="px-6 py-3">Kamar</th>
+                                <th scope="col" class="px-6 py-3">Jenis Sakit</th>
+                                <th scope="col" class="px-6 py-3">Status</th>
+                                <th scope="col" class="px-6 py-3">Penanganan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sickListTableBody">
+                            <!-- Data akan dimuat di sini oleh JavaScript -->
+                            <tr><td colspan="7" class="text-center py-10 text-gray-400">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
 
-        // ===================================================================================
-        // TODO: GANTI DENGAN KONFIGURASI FIREBASE ANDA
-        // Salin-tempel (copy-paste) objek konfigurasi dari Project Settings Firebase Anda di sini
-        const firebaseConfig = {
-  apiKey: "AIzaSyDFbX-6CRLe3joQekOhVwQq0QWhzkENHws",
-  authDomain: "aplikasimusyrifmbs.firebaseapp.com",
-  projectId: "aplikasimusyrifmbs",
-  storageBucket: "aplikasimusyrifmbs.firebasestorage.app",
-  messagingSenderId: "563895271320",
-  appId: "1:563895271320:web:7284a16cf90597bd7c75ed",
-  measurementId: "G-6Z81RESLX8"
-};
-        // ===================================================================================
-        
-        // --- Cek Konfigurasi Firebase ---
-        // Cek apakah konfigurasi masih placeholder. Jika ya, tampilkan peringatan dan hentikan eksekusi.
-        if (firebaseConfig.projectId === "nama-proyek" || firebaseConfig.apiKey === "AIza...") {
-            document.getElementById('firebase-warning').classList.remove('hidden');
-            // Nonaktifkan semua tombol submit untuk mencegah error
-            document.querySelectorAll('button[type="submit"]').forEach(button => {
-                button.disabled = true;
-                button.classList.add('opacity-50', 'cursor-not-allowed');
-            });
-            // Hentikan sisa script agar tidak mencoba koneksi ke Firebase yang salah
-            throw new Error("Firebase config is not set. Please update the firebaseConfig object in the script.");
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // --- KONFIGURASI APLIKASI ---
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyzi3QnM_u6GLtS0_ppmJntVAUM8-omwecUDAWvCANGoWWvjcVUgZAyV4ZT6fWyrRt7/exec";
+    const TOTAL_SANTRI = 193;
+
+    // --- DATA STATIS (Dropdown, dll) ---
+    const studentData = {
+        '7 A Putra': ['Athariz Chalief Saputra', 'Ahmad Khomaini', 'Al Athar Ghaizan Nobel', 'Alzabar Akbar', 'Arya Devano', 'Abyan Dzaky Hafizh Kurniawan', 'Fadil Syafif Nugho Sukri', 'Fakhri Muhammad Mumtaz', 'I Komang Raditiya Novian Pradana Putra', 'Ibad Najwan', 'Ibni Shidqie Al Mumtazhar', 'Kenzie Dastan Shalahuddin Zan', 'Khaerul A\'Zam Ismail', 'Khairiy Rezki Adhinata', 'Lionel Pratama Nugroho', 'Mahfidz Ardiansyah', 'Mohamad Akromul Azam', 'Mohammad Ezra Rafiandhika', 'Mufadilah Kafi Ananta', 'Muhammad Akhtar Al Hisyam', 'Muhammad Al Fatih', 'Muhammad Fatir Albahri', 'Muhammad Naufal Afkar', 'Muhammad Naufal Rizki', 'Muhammad Syamil At Tsauri', 'Nauval Abdul Rasyid', 'Pranatantra Fachrie', 'Rajata Ibnu Faqih', 'Reygi Antajun Hikaru', 'Rifqi Irfan Hamizan', 'Umar Al Jailaani', 'Yossa Dzulfi Andrean', 'Zahran Sahil'],
+        '7 B Putra': ['Abidzar Nuha Wafi', 'Ach. Raihan Faiz As-Sudaisyi', 'Ahmad Nazmu Durori', 'Akbar Nurfatah Arsadi', 'Akhdan Athaya Putra Zulfikar', 'Al Barra Ananta Putra', 'Alvey Sebastian Ansori', 'Annabighoh Syabanu Gunawan', 'Arrais Mahardika Rusli', 'Athaya Kaysan Hakim', 'Aufa Gilang Pratama', 'Bilal Abdul Aslam', 'Bintang Dasilva Ibrahim', 'Brilliant Alziddan Mustofa', 'Denny Maulana Yusuf', 'Fathir Muhammad Fadhilah', 'Haikal Ahfwan', 'Harry Harsya Shiddiq', 'Ifan Sofyan', 'Kenzie Adelio Tristan', 'Khairul Walif', 'Luthfirrahman Nafis Hananto', 'Muhammad Al-Gaza Putra Dewian', 'Muhammad Arafa Ekiyano Febrian', 'Muhammad Dilfa Fattan', 'Muhammad Fahriansyah', 'Muhammad Fathan Toriq', 'Muhammad Haikal Al Faisya', 'Muhammad Najetullah', 'Muhammad Raditya Fauzan', 'Muhammad Waldan', 'Rayhan Faiz Abdillah Hadiyanto', 'Sultan Fatih Setiawan', 'Zhafran Tata Hidayat'],
+        '10 Putra': ['Adhwa Arsya Gatfan', 'Afa Zaidan Putra Tamba', 'Ahmad Rafli Dhani Muzakki', 'Akmal Ihsan Huwaidi', 'Albisna Zinata Ababil', 'Asyraf Fairuz Mumtaz', 'Attiq Muzaki Ibrahim', 'Bayanaca Qotthon Elbarca', 'Bazyli Rafif Azka', 'Charli Andestian', 'Danendra Apta Kayana', 'Dhafinzha Muhammad Fakhri', 'Fasabbi Haqiqie Pramada Rozak', 'Irsyad Haitami Fajrin', 'Mikail Abdul Majid', 'Mochammad Alfath Dhafin', 'Muaimar Ghadafi M. Asri', 'Muhamad Fairuz Azmi', 'Muhamad Rafka Alvaro', 'Muhammad Adil Shidqi', 'Muhammad Agla Alfathur Rahman', 'Muhammad Ammar Muzakki', 'Muhammad Azmi', 'Muhammad Fahri Alfarizi', 'Muhammad Fahri Rosadi', 'Muhammad Suryo Nugra Putra Anwar', 'Nawwaf Bilza Pakpahan', 'Raditya Bustanul Tamam', 'Raihan Ramadhan', 'Salim Al Habsyi', 'Sayyid Aqil Sakhiy Wahyudi', 'Yudha Pratama Nurwicaksana Nasution'],
+        '7 A Putri': ['Adara Riyanti', 'Aghniya Musamma Harap', 'Ahla Amany Maulidya', 'Alivia Zahratukanza', 'Alya Ruby Salimah', 'Ameera Syahida Ajie', 'Asyifa Mahira Lubis', 'Bilqis Ghaisani Ahza', 'Callysta Lareina Nabiha', 'Cordelia Krisna Widyantari', 'Deyanna Abigail Baligha Zephania', 'Fathya Caliana', 'Filzah Ghaisani Fikriyah', 'Indhieswara Maharani', 'Kanaya Athalla Dzakiyyah', 'Kawa\'lba Puti Firmansyah', 'Keisha Sahila Az Zahra', 'Khansa Ghina Rachmani', 'Mehira Mehrnaz Multazam', 'Nadiya Fajria Salsabila', 'Novilly Azwan', 'Putri Mutia Rahmi', 'Queenisa Yumna Zahirah', 'Rita Madinatul Arofah', 'Saffanah Saafia Zahirah', 'Shelby Sinar Islamadina', 'Shira Rizkia Adara', 'Siti Shofa Aulia Rahman', 'Syifa Anindya', 'Talita Himayatul Kamilah', 'Talita Khansa Saputra', 'Yukqiu Natasha Ardi', 'Zivana Lay'],
+        '7 B Putri': ['Aesha Bellvania Kirana', 'Aira Fitriani Azzahra', 'Aisyah Fahira Husna', 'Alya Zahra Nabila', 'Ameera Isnain Setiadi', 'Aulia Zahra Ibrahim', 'Azizahtun Nazwa', 'Ghina Bilqis Shabreen', 'Hafizhah Alimah', 'Haninda Aulia Dayana', 'Hilma Arifa Aulia Rosid', 'Jihan Amira Karim', 'Keyla Khanza Ramadhani', 'Nafisa Al Mahira', 'Nailatisya Aquina Salsabilla', 'Nilam Maulina Anggrainin', 'R A Najeela Putri Widiarsa', 'Rhaqueena Aleameccha Alingga', 'Salsabila Zovanka', 'Shakila Aulia Sakhiy', 'Shifa Mumtazah', 'Siti Alifia Zahra', 'Siti Zahwa Naura Auni', 'Siti Ziarra Nur Al-Jaelani', 'Syafa Savira', 'Syakilah Putri Oktavia', 'Syakirah Rizqia Ramadani', 'Tuhfatun Najwa', 'Vinca Fitranavira Putri', 'Zhafira Nur Azzahra'],
+        '10 Putri': ['Alfina Dhiya Ulhaq', 'Amelinda Nur Febrina', 'Amira Azzarine', 'Anjeli Ghenia Asmedi', 'Aulia Zahra Nursakinah', 'Callysta Zhahira', 'Citra Aulia Saputra', 'Egidhea Sakha Gendis', 'Faiha Ulayya', 'Kanaya Azzalea Maulida', 'Kayla Putri Azzahra', 'Kesya Anastasya Putri', 'Keysha Hana Alzena', 'Khansa Avicenna', 'Maia Dina Islamiy Sobariah', 'Nailah Saffanah Rizqin', 'Najwa Althafunisa', 'Nasya Adya Mustafidah', 'Raihana Radwa Fahira', 'Ratu Syahlina Samlawi', 'Siti Aulia Rahma', 'Syifa Az Zahra', 'Tia Anggrianti', 'Ussy Elsinari', 'Vicky Fadilah Luthfiyana', 'Virly Evelyn Dean Zahra', 'Wildatul Hasanah', 'Yolanda Febriani', 'Yuha Rizqiyatul Muyassaroh', 'Zahiratul Aisyi', 'Zulfa Nurul Fauziah']
+    };
+    const sicknessList = ['Alergi', 'Anemia', 'Asma', 'Batuk', 'Cantengan (Paronikia)', 'Cedera / Luka lecet / memar', 'Cemas berlebihan', 'Demam ringan', 'Diare', 'Flu', 'Gatal Kulit', 'Insomnia / sulit tidur', 'Keseleo', 'Luka bakar ringan', 'Maag', 'Masuk angin', 'Mual', 'Nyeri haid', 'Nyeri otot', 'Panas Dalam', 'Pegal', 'Perut Kembung', 'Pilek', 'Pusing Lemas', 'Radang tenggorokan', 'Sakit gigi', 'Sakit kepala / migrain', 'Sakit mata', 'Sariawan', 'Terkilir', 'Lainnya'];
+    const achievementList = [ { text: 'Datang tepat waktu 1 minggu penuh tanpa absen', points: 5 }, { text: 'Menambah hafalan Qur\'an sesuai target mingguan', points: 5}, { text: 'Menjaga kerapihan kamar & area umum (1 bulan)', points: 10 }, { text: 'Menghafal 50 mufradat baru per bulan', points: 10 }, { text: 'Menunjukkan sopan santun ekstra (1 bulan)', points: 10 }, { text: 'Menang lomba di sekolah', points: 15 }, { text: 'Menang lomba tingkat kecamatan', points: 20 }, { text: 'Menang lomba tingkat kota/provinsi', points: 25 } ];
+
+    // --- State untuk menyimpan semua data ---
+    let allHealthData = [];
+    let allPermissionData = [];
+
+    // --- PEMUATAN GOOGLE CHARTS ---
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(initializeDashboard);
+
+    // --- ELEMENT SELECTORS ---
+    const chartFilterButtons = document.querySelectorAll('#chart-filter .filter-btn');
+    const healthForm = document.getElementById('healthForm');
+    const healthSubmitBtn = document.getElementById('healthSubmitBtn');
+    const permissionForm = document.getElementById('permissionForm');
+    const permissionSubmitBtn = document.getElementById('permissionSubmitBtn');
+    const achievementForm = document.getElementById('achievementForm');
+    const achieveSubmitBtn = document.getElementById('achieveSubmitBtn');
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+    const quickNoteDisplay = document.getElementById('quick-note-display');
+    const sickListTableBody = document.getElementById('sickListTableBody');
+    const sickListTitle = document.getElementById('sick-list-title');
+
+    // --- FUNGSI UI & DATA ---
+    function populateSelect(selectElement, options) { options.forEach(option => { const opt = document.createElement('option'); opt.value = option; opt.textContent = option; selectElement.appendChild(opt); }); }
+    function populateStudentNames(classSelect, nameSelect) { const selectedClass = classSelect.value; nameSelect.innerHTML = '<option value="">Pilih Nama</option>'; if (selectedClass && studentData[selectedClass]) { populateSelect(nameSelect, studentData[selectedClass]); } }
+    function updateHijriDate() {
+        const hijriDate = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-civil', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
+        document.getElementById('hijri-date').textContent = hijriDate;
+    }
+    
+    // --- FUNGSI FILTER TANGGAL ---
+    function isSameDay(date1, date2) { return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth() && date1.getDate() === date2.getDate(); }
+    function isSameWeek(dateToCheck, today) {
+        const firstDayOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1))); // Set Senin sebagai hari pertama
+        firstDayOfWeek.setHours(0, 0, 0, 0);
+        const lastDayOfWeek = new Date(firstDayOfWeek);
+        lastDayOfWeek.setDate(lastDayOfWeek.getDate() + 6);
+        lastDayOfWeek.setHours(23, 59, 59, 999);
+        return dateToCheck >= firstDayOfWeek && dateToCheck <= lastDayOfWeek;
+    }
+    function isSameMonth(date1, date2) { return date1.getFullYear() === date2.getFullYear() && date1.getMonth() === date2.getMonth(); }
+
+    // --- INISIALISASI UI ---
+    const today = new Date().toISOString().split('T')[0];
+    const classNames = Object.keys(studentData);
+    populateSelect(document.getElementById('healthClass'), classNames);
+    populateSelect(document.getElementById('healthSickness'), sicknessList);
+    document.getElementById('healthDate').value = today;
+    populateSelect(document.getElementById('permissionClass'), classNames);
+    document.getElementById('permissionDate').value = today;
+    populateSelect(document.getElementById('achieveClass'), classNames);
+    const achieveTypeSelect = document.getElementById('achieveType');
+    achievementList.forEach(ach => { const opt = document.createElement('option'); opt.value = ach.text; opt.textContent = ach.text; opt.dataset.points = ach.points; achieveTypeSelect.appendChild(opt); });
+    document.getElementById('achieveDate').value = today;
+    updateHijriDate(); // Panggil fungsi tanggal Hijriyah
+
+    // --- EVENT LISTENERS UI ---
+    tabButtons.forEach(button => { button.addEventListener('click', () => { tabButtons.forEach(btn => btn.classList.remove('tab-active')); tabButtons.forEach(btn => { if(btn !== button) { btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300'); }}); button.classList.add('tab-active'); const tabId = button.dataset.tab; tabPanels.forEach(panel => { panel.id === `${tabId}-tab` ? panel.classList.remove('hidden') : panel.classList.add('hidden'); }); }); });
+    document.getElementById('healthClass').addEventListener('change', () => populateStudentNames(document.getElementById('healthClass'), document.getElementById('healthName')));
+    document.getElementById('permissionClass').addEventListener('change', () => populateStudentNames(document.getElementById('permissionClass'), document.getElementById('permissionName')));
+    document.getElementById('achieveClass').addEventListener('change', () => populateStudentNames(document.getElementById('achieveClass'), document.getElementById('achieveName')));
+    achieveTypeSelect.addEventListener('change', function() { const selectedOption = this.options[this.selectedIndex]; document.getElementById('achievePoints').value = selectedOption.dataset.points || ''; });
+    
+    // Event listener untuk tombol filter
+    chartFilterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            chartFilterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            const period = button.dataset.period;
+            processAndDrawData(period);
+        });
+    });
+
+    // --- FUNGSI SUBMIT FORM ---
+    async function submitFormData(formElement, sheetName, submitButton) {
+        const formData = new FormData(formElement);
+        const data = Object.fromEntries(formData.entries());
+        data.sheetName = sheetName;
+        const originalButtonText = submitButton.textContent;
+        submitButton.disabled = true; submitButton.textContent = 'Menyimpan...'; submitButton.classList.add('btn-loading');
+        try {
+            const response = await fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(data) });
+            const result = await response.json();
+            if (result.status === "success") {
+                alert(result.message); formElement.reset();
+                const nameDropdown = formElement.querySelector('select[name="nama_santri"]'); if (nameDropdown) { nameDropdown.innerHTML = '<option value="">Pilih Nama</option>'; }
+                const dateInput = formElement.querySelector('input[type="date"]'); if(dateInput) { dateInput.value = today; }
+                const pointsInput = formElement.querySelector('input[name="poin"]'); if(pointsInput) { pointsInput.value = ''; }
+                
+                // Fetch ulang semua data setelah submit berhasil
+                initializeDashboard();
+
+            } else { throw new Error(result.message || 'Terjadi kesalahan.'); }
+        } catch (error) { console.error("Error submitting data: ", error); alert(`Gagal menyimpan data: ${error.message}`);
+        } finally { submitButton.disabled = false; submitButton.textContent = originalButtonText; submitButton.classList.remove('btn-loading'); }
+    }
+    healthForm.addEventListener('submit', (e) => { e.preventDefault(); submitFormData(healthForm, 'Data Kesehatan', healthSubmitBtn); });
+    permissionForm.addEventListener('submit', (e) => { e.preventDefault(); submitFormData(permissionForm, 'Data Perizinan', permissionSubmitBtn); });
+    achievementForm.addEventListener('submit', (e) => { e.preventDefault(); submitFormData(achievementForm, 'Data Prestasi', achieveSubmitBtn); });
+    
+    // --- FUNGSI CHART ---
+    function drawHealthChart(sickCount, healthyCount) {
+        const data = google.visualization.arrayToDataTable([
+            ['Status', 'Jumlah'],
+            ['Sakit', sickCount],
+            ['Sehat', healthyCount]
+        ]);
+        const options = {
+            is3D: true,
+            pieSliceText: 'percentage',
+            colors: ['#EF4444', '#3B82F6'], // Warna biru diganti menjadi lebih terang
+            pieSliceOpacity: 0.8,
+            backgroundColor: 'transparent',
+            fontName: 'Inter',
+            legend: { position: 'none' }, // Legenda disembunyikan untuk layout baru
+            chartArea: {'width': '100%', 'height': '100%'},
+            tooltip: { textStyle: { fontName: 'Inter' } }
+        };
+        const chart = new google.visualization.PieChart(document.getElementById('healthChart'));
+        chart.draw(data, options);
+    }
+
+    function updatePermissionCircle(permissionCount) {
+        const percentage = TOTAL_SANTRI > 0 ? (permissionCount / TOTAL_SANTRI) * 100 : 0;
+        const circleProgress = document.getElementById('permission-circle-progress');
+        const countElement = document.getElementById('permission-count');
+
+        // Update elemen teks tambahan
+        document.getElementById('permission-total-count').textContent = permissionCount;
+        document.getElementById('permission-percentage').textContent = `${percentage.toFixed(1)}%`;
+
+        if (circleProgress && countElement) {
+            countElement.textContent = permissionCount;
+            circleProgress.style.strokeDasharray = `${percentage.toFixed(2)}, 100`;
+        }
+    }
+
+
+    // --- FUNGSI PENGOLAHAN DAN PENGGAMBARAN DATA ---
+    function processAndDrawData(period) {
+        const now = new Date();
+        let filterFunction;
+        let titleSuffix;
+
+        if (period === 'day') {
+            filterFunction = (date) => isSameDay(date, now);
+            titleSuffix = "Hari Ini";
+        } else if (period === 'week') {
+            filterFunction = (date) => isSameWeek(date, new Date());
+            titleSuffix = "Minggu Ini";
+        } else if (period === 'month') {
+            filterFunction = (date) => isSameMonth(date, now);
+            titleSuffix = "Bulan Ini";
         }
 
+        // Update periode di kartu
+        document.getElementById('health-card-period').textContent = titleSuffix;
+        document.getElementById('permission-card-period').textContent = titleSuffix;
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        // Proses Data Kesehatan
+        const filteredHealthData = allHealthData.filter(entry => entry.tanggal_sakit && filterFunction(new Date(entry.tanggal_sakit)));
+        const sickCount = filteredHealthData.length;
+        const healthyCount = TOTAL_SANTRI - sickCount;
+        drawHealthChart(sickCount, healthyCount);
+        document.getElementById('health-sick-count').textContent = sickCount;
+        document.getElementById('health-healthy-count').textContent = healthyCount;
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // --- DATA STATIS (Sama seperti sebelumnya) ---
-            const studentData = {
-                '7 A Putra': ['Athariz Chalief Saputra', 'Ahmad Khomaini', 'Al Athar Ghaizan Nobel', 'Alzabar Akbar', 'Arya Devano', 'Abyan Dzaky Hafizh Kurniawan', 'Fadil Syafif Nugroho Sukri', 'Fakhri Muhammad Mumtaz', 'I Komang Raditiya Novian Pradana Putra', 'Ibad Najwan', 'Ibni Shidqie Al Mumtazhar', 'Kenzie Dastan Shalahuddin Zan', 'Khaerul A\'Zam Ismail', 'Khairiy Rezki Adhinata', 'Lionel Pratama Nugroho', 'Mahfidz Ardiansyah', 'Mohamad Akromul Azam', 'Mohammad Ezra Rafiandhika', 'Mufadilah Kafi Ananta', 'Muhammad Akhtar Al Hisyam', 'Muhammad Al Fatih', 'Muhammad Fatir Albahri', 'Muhammad Naufal Afkar', 'Muhammad Naufal Rizki', 'Muhammad Syamil At Tsauri', 'Nauval Abdul Rasyid', 'Pranatantra Fachrie', 'Rajata Ibnu Faqih', 'Reygi Antajun Hikaru', 'Rifqi Irfan Hamizan', 'Umar Al Jailaani', 'Yossa Dzulfi Andrean', 'Zahran Sahil'],
-                '7 B Putra': ['Abidzar Nuha Wafi', 'Ach. Raihan Faiz As-Sudaisyi', 'Ahmad Nazmu Durori', 'Akbar Nurfatah Arsadi', 'Akhdan Athaya Putra Zulfikar', 'Al Barra Ananta Putra', 'Alvey Sebastian Ansori', 'Annabighoh Syabanu Gunawan', 'Arrais Mahardika Rusli', 'Athaya Kaysan Hakim', 'Aufa Gilang Pratama', 'Bilal Abdul Aslam', 'Bintang Dasilva Ibrahim', 'Brilliant Alziddan Mustofa', 'Denny Maulana Yusuf', 'Fathir Muhammad Fadhilah', 'Haikal Ahfwan', 'Harry Harsya Shiddiq', 'Ifan Sofyan', 'Kenzie Adelio Tristan', 'Khairul Walif', 'Luthfirrahman Nafis Hananto', 'Muhammad Al-Gaza Putra Dewian', 'Muhammad Arafa Ekiyano Febrian', 'Muhammad Dilfa Fattan', 'Muhammad Fahriansyah', 'Muhammad Fathan Toriq', 'Muhammad Haikal Al Faisya', 'Muhammad Najetullah', 'Muhammad Raditya Fauzan', 'Muhammad Waldan', 'Rayhan Faiz Abdillah Hadiyanto', 'Sultan Fatih Setiawan', 'Zhafran Tata Hidayat'],
-                '10 Putra': ['Adhwa Arsya Gatfan', 'Afa Zaidan Putra Tamba', 'Ahmad Rafli Dhani Muzakki', 'Akmal Ihsan Huwaidi', 'Albisna Zinata Ababil', 'Asyraf Fairuz Mumtaz', 'Attiq Muzaki Ibrahim', 'Bayanaca Qotthon Elbarca', 'Bazyli Rafif Azka', 'Charli Andestian', 'Danendra Apta Kayana', 'Dhafinzha Muhammad Fakhri', 'Fasabbi Haqiqie Pramada Rozak', 'Irsyad Haitami Fajrin', 'Mikail Abdul Majid', 'Mochammad Alfath Dhafin', 'Muaimar Ghadafi M. Asri', 'Muhamad Fairuz Azmi', 'Muhamad Rafka Alvaro', 'Muhammad Adil Shidqi', 'Muhammad Agla Alfathur Rahman', 'Muhammad Ammar Muzakki', 'Muhammad Azmi', 'Muhammad Fahri Alfarizi', 'Muhammad Fahri Rosadi', 'Muhammad Suryo Nugra Putra Anwar', 'Nawwaf Bilza Pakpahan', 'Raditya Bustanul Tamam', 'Raihan Ramadhan', 'Salim Al Habsyi', 'Sayyid Aqil Sakhiy Wahyudi', 'Yudha Pratama Nurwicaksana Nasution'],
-                '7 A Putri': ['Adara Riyanti', 'Aghniya Musamma Harap', 'Ahla Amany Maulidya', 'Alivia Zahratukanza', 'Alya Ruby Salimah', 'Ameera Syahida Ajie', 'Asyifa Mahira Lubis', 'Bilqis Ghaisani Ahza', 'Callysta Lareina Nabiha', 'Cordelia Krisna Widyantari', 'Deyanna Abigail Baligha Zephania', 'Fathya Caliana', 'Filzah Ghaisani Fikriyah', 'Indhieswara Maharani', 'Kanaya Athalla Dzakiyyah', 'Kawa\'Iba Puti Firmansyah', 'Keisha Sahila Az Zahra', 'Khansa Ghina Rachmani', 'Mehira Mehrnaz Multazam', 'Nadiya Fajria Salsabila', 'Novilly Azwan', 'Putri Mutia Rahmi', 'Queenisa Yumna Zahirah', 'Rita Madinatul Arofah', 'Saffanah Saafia Zahirah', 'Shelby Sinar Islamadina', 'Shira Rizkia Adara', 'Siti Shofa Aulia Rahman', 'Syifa Anindya', 'Talita Himayatul Kamilah', 'Talita Khansa Saputra', 'Yukqiu Natasha Ardi', 'Zivana Lay'],
-                '7 B Putri': ['Aesha Bellvania Kirana', 'Aira Fitriani Azzahra', 'Aisyah Fahira Husna', 'Alya Zahra Nabila', 'Ameera Isnain Setiadi', 'Aulia Zahra Ibrahim', 'Azizahtun Nazwa', 'Ghina Bilqis Shabreen', 'Hafizhah Alimah', 'Haninda Aulia Dayana', 'Hilma Arifa Aulia Rosid', 'Jihan Amira Karim', 'Keyla Khanza Ramadhani', 'Nafisa Al Mahira', 'Nailatisya Aquina Salsabilla', 'Nilam Maulina Anggrainin', 'R A Najeela Putri Widiarsa', 'Rhaqueena Aleameccha Alingga', 'Salsabila Zovanka', 'Shakila Aulia Sakhiy', 'Shifa Mumtazah', 'Siti Alifia Zahra', 'Siti Zahwa Naura Auni', 'Siti Ziarra Nur Al-Jaelani', 'Syafa Savira', 'Syakilah Putri Oktavia', 'Syakirah Rizqia Ramadani', 'Tuhfatun Najwa', 'Vinca Fitranavira Putri', 'Zhafira Nur Azzahra'],
-                '10 Putri': ['Alfina Dhiya Ulhaq', 'Amelinda Nur Febrina', 'Amira Azzarine', 'Anjeli Ghenia Asmedi', 'Aulia Zahra Nursakinah', 'Callysta Zhahira', 'Citra Aulia Saputra', 'Egidhea Sakha Gendis', 'Faiha Ulayya', 'Kanaya Azzalea Maulida', 'Kayla Putri Azzahra', 'Kesya Anastasya Putri', 'Keysha Hana Alzena', 'Khansa Avicenna', 'Maia Dina Islamiy Sobariah', 'Nailah Saffanah Rizqin', 'Najwa Althafunisa', 'Nasya Adya Mustafidah', 'Raihana Radwa Fahira', 'Ratu Syahlina Samlawi', 'Siti Aulia Rahma', 'Syifa Az Zahra', 'Tia Anggrianti', 'Ussy Elsinasari', 'Vicky Fadilah Luthfiyana', 'Virly Evelyn Dean Zahra', 'Wildatul Hasanah', 'Yolanda Febriani', 'Yuha Rizqiyatul Muyassaroh', 'Zahiratul Aisyi', 'Zulfa Nurul Fauziah']
-            };
-            const sicknessList = ['Alergi', 'Anemia', 'Asma', 'Batuk', 'Cantengan (Paronikia)', 'Cedera / Luka lecet / memar', 'Cemas berlebihan', 'Demam ringan', 'Diare', 'Flu', 'Gatal Kulit', 'Insomnia / sulit tidur', 'Keseleo', 'Luka bakar ringan', 'Maag', 'Masuk angin', 'Mual', 'Nyeri haid', 'Nyeri otot', 'Panas Dalam', 'Pegal', 'Perut Kembung', 'Pilek', 'Pusing Lemas', 'Radang tenggorokan', 'Sakit gigi', 'Sakit kepala / migrain', 'Sakit mata', 'Sariawan', 'Terkilir', 'Lainnya'];
-            const achievementList = [ { text: 'Datang tepat waktu 1 minggu penuh tanpa absen', points: 5 }, { text: 'Menambah hafalan Qur’an sesuai target mingguan', points: 5 }, { text: 'Menjaga kerapihan kamar & area umum (1 bulan)', points: 10 }, { text: 'Menghafal 50 mufradat baru per bulan', points: 10 }, { text: 'Menunjukkan sopan santun ekstra (1 bulan)', points: 10 }, { text: 'Menang lomba di sekolah', points: 15 }, { text: 'Menang lomba tingkat kecamatan', points: 20 }, { text: 'Menang lomba tingkat kota/provinsi', points: 25 } ];
+        // Update Tabel Santri Sakit
+        sickListTitle.textContent = `Informasi Santri Sakit ${titleSuffix}`;
+        sickListTableBody.innerHTML = '';
+        if (filteredHealthData.length === 0) {
+            sickListTableBody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-gray-400">Tidak ada data santri sakit untuk ${titleSuffix.toLowerCase()}.</td></tr>`;
+        } else {
+            filteredHealthData.forEach(data => {
+                const row = sickListTableBody.insertRow();
+                row.className = 'bg-white border-b hover:bg-gray-50';
+                row.innerHTML = `<td class="px-6 py-4">${new Date(data.tanggal_sakit).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</td><td class="px-6 py-4">${data.kelas || ''}</td><td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">${data.nama_santri || ''}</td><td class="px-6 py-4">${data.kamar || ''}</td><td class="px-6 py-4">${data.jenis_sakit || ''}</td><td class="px-6 py-4">${data.status || ''}</td><td class="px-6 py-4">${data.penanganan || ''}</td>`;
+            });
+        }
+        
+        // Proses Data Perizinan
+        const filteredPermissionData = allPermissionData.filter(entry => entry.tanggal_izin && filterFunction(new Date(entry.tanggal_izin)));
+        const permissionCount = filteredPermissionData.length;
+        updatePermissionCircle(permissionCount);
+    }
 
-            // --- ELEMENT SELECTORS ---
-            const healthForm = document.getElementById('healthForm');
-            const healthSubmitBtn = document.getElementById('healthSubmitBtn');
-            const sickListTableBody = document.getElementById('sickListTableBody');
-            const achievementForm = document.getElementById('achievementForm');
-            const achieveSubmitBtn = document.getElementById('achieveSubmitBtn');
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabPanels = document.querySelectorAll('.tab-panel');
+    // --- FUNGSI FETCH & INISIALISASI ---
+    async function fetchAllData(action) {
+        const response = await fetch(`${SCRIPT_URL}?action=${action}`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const result = await response.json();
+        if (result.status !== 'success') throw new Error(result.message);
+        return result.data;
+    }
+    
+    async function initializeDashboard() {
+        try {
+            // Tampilkan loader di kartu
+            document.getElementById('healthChart').innerHTML = `<div class="flex items-center justify-center h-full text-gray-500">Memuat...</div>`;
+            document.getElementById('permission-count').textContent = '...';
+
+            // Ambil semua data sekali saja saat loading
+            [allHealthData, allPermissionData] = await Promise.all([
+                fetchAllData('getSickList'),
+                fetchAllData('getPermissionList')
+            ]);
             
-            // --- FUNGSI UI ---
-            function populateSelect(selectElement, options) { options.forEach(option => { const opt = document.createElement('option'); opt.value = option; opt.textContent = option; selectElement.appendChild(opt); }); }
-            function populateStudentNames(classSelect, nameSelect) { const selectedClass = classSelect.value; nameSelect.innerHTML = '<option value="">Pilih Nama</option>'; if (selectedClass && studentData[selectedClass]) { populateSelect(nameSelect, studentData[selectedClass]); } }
-            function updateDateTime() { const now = new Date(); const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }; document.getElementById('current-date').textContent = now.toLocaleDateString('id-ID', optionsDate); document.getElementById('current-time').textContent = now.toLocaleTimeString('id-ID'); }
+            // Tampilkan data default (Hari Ini)
+            processAndDrawData('day');
 
-            // --- INISIALISASI UI ---
-            const classNames = Object.keys(studentData);
-            populateSelect(document.getElementById('healthClass'), classNames);
-            populateSelect(document.getElementById('achieveClass'), classNames);
-            populateSelect(document.getElementById('healthSickness'), sicknessList);
-            const achieveTypeSelect = document.getElementById('achieveType');
-            achievementList.forEach(ach => { const opt = document.createElement('option'); opt.value = ach.text; opt.textContent = ach.text; opt.dataset.points = ach.points; achieveTypeSelect.appendChild(opt); });
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('healthDate').value = today;
-            document.getElementById('achieveDate').value = today;
-            updateDateTime(); setInterval(updateDateTime, 1000);
+        } catch (error) {
+            console.error("Gagal memuat data awal:", error);
+            document.getElementById('healthChart').innerHTML = `<div class="flex items-center justify-center h-full text-red-500 text-center text-sm p-4">Gagal memuat data grafik</div>`;
+            document.querySelector('#permission-count').parentElement.parentElement.innerHTML = `<div class="flex items-center justify-center h-full text-red-500 text-center text-sm p-4">Gagal memuat data grafik</div>`;
+            sickListTableBody.innerHTML = `<tr><td colspan="7" class="text-center py-10 text-red-500">Gagal memuat data. Periksa koneksi dan coba lagi.</td></tr>`;
+        }
+        
+        // Fetch Quick Note secara terpisah
+        try {
+            const response = await fetch(SCRIPT_URL);
+            const result = await response.json();
+            if (result.status === 'success') {
+                quickNoteDisplay.textContent = result.note;
+            } else { throw new Error(result.message); }
+        } catch (error) {
+            quickNoteDisplay.textContent = "Gagal memuat catatan.";
+            console.error("Fetch note error:", error);
+        }
+    }
+});
+</script>
 
-            // --- EVENT LISTENERS UI ---
-            tabButtons.forEach(button => { button.addEventListener('click', () => { tabButtons.forEach(btn => btn.classList.remove('tab-active')); tabButtons.forEach(btn => { if(btn !== button){ btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300'); }}); button.classList.add('tab-active'); const tabId = button.dataset.tab; tabPanels.forEach(panel => { panel.id === `${tabId}-tab` ? panel.classList.remove('hidden') : panel.classList.add('hidden'); }); }); });
-            document.getElementById('healthClass').addEventListener('change', () => populateStudentNames(document.getElementById('healthClass'), document.getElementById('healthName')));
-            document.getElementById('achieveClass').addEventListener('change', () => populateStudentNames(document.getElementById('achieveClass'), document.getElementById('achieveName')));
-            achieveTypeSelect.addEventListener('change', function() { const selectedOption = this.options[this.selectedIndex]; document.getElementById('achievePoints').value = selectedOption.dataset.points || ''; });
-
-            // --- FIREBASE REAL-TIME LISTENERS ---
-
-            // 1. Listener untuk data kesehatan (Tabel & Statistik)
-            const healthQuery = query(collection(db, "data_kesehatan"), orderBy("tanggal_sakit", "desc"));
-            onSnapshot(healthQuery, (querySnapshot) => {
-                sickListTableBody.innerHTML = ''; // Kosongkan tabel
-                let sickCount = 0;
-                let permissionCount = 0;
-
-                if (querySnapshot.empty) {
-                    sickListTableBody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-gray-400">Belum ada data santri sakit.</td></tr>`;
-                } else {
-                    querySnapshot.forEach((doc) => {
-                        const data = doc.data();
-                        
-                        // Update tabel
-                        const newRow = sickListTableBody.insertRow();
-                        newRow.className = 'bg-white border-b hover:bg-gray-50';
-                        newRow.innerHTML = `<td class="px-6 py-4">${new Date(data.tanggal_sakit).toLocaleDateString('id-ID')}</td><td class="px-6 py-4">${data.kelas}</td><td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">${data.nama_santri}</td><td class="px-6 py-4">${data.jenis_sakit}</td><td class="px-6 py-4">${data.penanganan}</td><td class="px-6 py-4"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${data.status === 'Sembuh' ? 'bg-green-100 text-green-800' : data.status === 'Izin Pulang' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}">${data.status}</span></td>`;
-
-                        // Hitung statistik
-                        if (data.status === 'Masih Sakit') sickCount++;
-                        if (data.status === 'Izin Pulang') permissionCount++;
-                    });
-                }
-                // Update kartu statistik
-                document.getElementById('stat-sakit').textContent = sickCount;
-                document.getElementById('stat-izin').textContent = permissionCount;
-            });
-
-            // 2. Listener untuk data prestasi (Statistik)
-            onSnapshot(collection(db, "data_prestasi"), (querySnapshot) => {
-                document.getElementById('stat-berprestasi').textContent = querySnapshot.size;
-            });
-
-            // 3. Listener untuk Quick Notes
-            onSnapshot(doc(db, "catatan", "quick_note"), (doc) => {
-                if (doc.exists()) {
-                    document.getElementById('quick-note-content').textContent = doc.data().pesan;
-                } else {
-                    document.getElementById('quick-note-content').textContent = "Catatan belum diatur di database.";
-                }
-            });
-
-            // --- FIREBASE FORM SUBMISSION ---
-            
-            // Kirim data kesehatan ke Firebase
-            healthForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const formData = new FormData(healthForm);
-                const data = Object.fromEntries(formData.entries());
-
-                healthSubmitBtn.disabled = true;
-                healthSubmitBtn.textContent = 'Menyimpan...';
-                healthSubmitBtn.classList.add('btn-loading');
-
-                try {
-                    await addDoc(collection(db, "data_kesehatan"), data);
-                    alert('Data kesehatan berhasil disimpan ke database!');
-                    healthForm.reset();
-                    document.getElementById('healthName').innerHTML = '<option value="">Pilih Nama</option>';
-                    document.getElementById('healthDate').value = today;
-                } catch (error) {
-                    console.error("Error adding document: ", error);
-                    alert('Gagal menyimpan data. Silakan coba lagi.');
-                } finally {
-                    healthSubmitBtn.disabled = false;
-                    healthSubmitBtn.textContent = 'Simpan Data';
-                    healthSubmitBtn.classList.remove('btn-loading');
-                }
-            });
-
-            // Kirim data prestasi ke Firebase
-            achievementForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const formData = new FormData(achievementForm);
-                const data = Object.fromEntries(formData.entries());
-                data.poin = Number(data.poin); // Pastikan poin adalah angka
-
-                achieveSubmitBtn.disabled = true;
-                achieveSubmitBtn.textContent = 'Menyimpan...';
-                achieveSubmitBtn.classList.add('btn-loading');
-
-                try {
-                    await addDoc(collection(db, "data_prestasi"), data);
-                    alert('Poin prestasi berhasil ditambahkan ke database!');
-                    achievementForm.reset();
-                    document.getElementById('achieveName').innerHTML = '<option value="">Pilih Nama</option>';
-                    document.getElementById('achievePoints').value = '';
-                    document.getElementById('achieveDate').value = today;
-                } catch (error) {
-                    console.error("Error adding document: ", error);
-                    alert('Gagal menyimpan data. Silakan coba lagi.');
-                } finally {
-                    achieveSubmitBtn.disabled = false;
-                    achieveSubmitBtn.textContent = 'Tambah Poin';
-                    achieveSubmitBtn.classList.remove('btn-loading');
-                }
-            });
-        });
-    </script>
 </body>
 </html>
+
